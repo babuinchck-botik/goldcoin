@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Счета GoldCoin</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: #eef1f6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 12px;
+    margin: 0;
+  }
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 24px;
+    height: fit-content;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; text-align: center; }
+  h2 { font-size: 17px; margin: 18px 0 10px; }
+  .sub { text-align: center; color: #9fb0c9; font-size: 13px; margin: 0 0 18px; }
+  .btn {
+    display: block; width: 100%;
+    padding: 14px; margin: 10px 0;
+    font-size: 16px; font-weight: 600;
+    border: none; border-radius: 12px;
+    cursor: pointer;
+    background: #4f7cff; color: #fff;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.green { background: #2fae66; }
+  .btn.small { padding: 8px 12px; font-size: 13px; width: auto; margin: 0; }
+  input {
+    width: 100%;
+    padding: 12px; margin: 6px 0;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    outline: none;
+  }
+  input:focus { border-color: #4f7cff; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .row input { flex: 1; margin: 0; }
+  .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
+  .err { color: #ff7b7b; }
+  .ok { color: #6ee7a0; }
+  .acct {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 12px; margin: 10px 0;
+  }
+  .acct .name { font-weight: 700; font-size: 16px; }
+  .acct .bal { color: #ffd166; margin: 4px 0; }
+  .pw { color: #9fb0c9; font-size: 13px; cursor: pointer; user-select: none; }
+  .newpw { display: flex; gap: 8px; margin-top: 8px; }
+  .newpw input { flex: 1; margin: 0; padding: 8px; font-size: 13px; }
+  .del {
+    background: none; border: none; color: #ff7b7b;
+    font-size: 18px; cursor: pointer; padding: 4px 8px;
+  }
+  .balance-big {
+    font-size: 34px; font-weight: 800; color: #ffd166;
+    text-align: center; margin: 14px 0;
+  }
+  .back {
+    background: none; border: none; color: #9fb0c9;
+    cursor: pointer; font-size: 14px; padding: 6px 0; margin-bottom: 8px;
+  }
+  .hidden { display: none; }
+  .gold { color: #ffd166; }
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://gstatic.com";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://gstatic.com";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDgae6MDMQ1FM4Anlg7R7qPGX3Kc-DagPQ",
+    authDomain: "://firebaseapp.com",
+    projectId: "goldcoin-accounts",
+    storageBucket: "goldcoin-accounts.firebasestorage.app",
+    messagingSenderId: "587303464356",
+    appId: "1:587303464356:web:72adddaef46fde263ca531"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const STORE_KEY = 'goldcoin_accounts_v1';
+
+  onSnapshot(doc(db, "database", "global_state"), (docSnap) => {
+    if (docSnap.exists()) {
+      const cloudData = docSnap.data().accounts || [];
+      localStorage.setItem(STORE_KEY, JSON.stringify(cloudData));
+      if (typeof window.updateCurrentScreen === 'function') {
+        window.updateCurrentScreen();
+      }
+    }
+  });
+
+  async function syncToCloud() {
+    try {
+      const localData = JSON.parse(localStorage.getItem(STORE_KEY)) || [];
+      await setDoc(doc(db, "database", "global_state"), { accounts: localData });
+      console.log("Данные синхронизированы!");
+    } catch (e) {
+      console.error("Ошибка синхронизации:", e);
+    }
+  }
+
+  window.syncToCloud = syncToCloud;
+</script>
+</head>
+<body>
+<div class="card">
+
+  <!-- ГЛАВНЫЙ ЭКРАН -->
+  <div id="screen-home">
+    <h1>💰 Счета GoldCoin</h1>
+    <p class="sub">Добро пожаловать</p>
+    <button class="btn" onclick="showScreen('admin-login')">🔐 Admin</button>
+    <button class="btn green" onclick="showScreen('my-login')">👤 Мой счёт</button>
+  </div>
+
+  <!-- ВХОД АДМИНА -->
+  <div id="screen-admin-login" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Назад</button>
+    <h2>Вход для админа</h2>
+    <input type="password" id="admin-pass" placeholder="Пароль админа">
+    <button class="btn" onclick="adminLogin()">Войти</button>
+    <div class="msg err" id="admin-msg"></div>
+  </div>
+
+  <!-- ПАНЕЛЬ АДМИНА -->
+  <div id="screen-admin" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Выйти</button>
+    <h2>Панель админа</h2>
+    <h3 style="margin:14px 0 6px;font-size:14px;">Создать счёт</h3>
+    <input id="new-nick" placeholder="Ник">
+    <input id="new-pass" placeholder="Пароль">
+    <button class="btn green" onclick="createAccount()">Создать счёт</button>
+    <div class="msg" id="create-msg"></div>
+    <h3 style="margin:14px 0 6px;font-size:14px;">Счета</h3>
+    <div id="admin-list"></div>
+  </div>
+
+  <!-- ВХОД ПОЛЬЗОВАТЕЛЯ -->
+  <div id="screen-my-login" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Назад</button>
+    <h2>Мой счёт</h2>
+    <input id="my-nick" placeholder="Ник">
+    <input type="password" id="my-pass" placeholder="Пароль">
+    <button class="btn green" onclick="myLogin()">Войти</button>
+    <div class="msg err" id="my-msg"></div>
+  </div>
+
+  <!-- МОЙ СЧЁТ -->
+  <div id="screen-my" class="hidden">
+    <button class="back" onclick="myLogout()">← Выйти</button>
+    <h2 id="my-title">Счёт</h2>
+    <div class="balance-big" id="my-balance"></div>
+    <p class="sub">Ваш баланс в goldcoin</p>
+    <h3 style="margin:14px 0 6px;font-size:14px;">Перевести</h3>
+    <input id="tr-nick" placeholder="Ник получателя">
+    <input id="tr-amount" type="number" min="0" step="0.01" placeholder="Сумма в goldcoin">
+    <button class="btn" onclick="doTransfer()">Перевести</button>
+    <div class="msg" id="tr-msg"></div>
+  </div>
+
+</div>
+<script>
+const ADMIN_PASSWORD = '666306227666';
+const STORE_KEY = 'goldcoin_accounts_v1';
+let currentNick = null;
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch(e) { return []; }
+}
+
+function save(accs) { 
+  localStorage.setItem(STORE_KEY, JSON.stringify(accs)); 
+  if (typeof window.syncToCloud === 'function') {
+    window.syncToCloud();
+  }
+}
+
+function showScreen(name) {
+  ['home','admin-login','admin','my-login','my'].forEach(s => {
+    const el = document.getElementById('screen-'+s);
+    if(el) el.classList.toggle('hidden', s !== name);
+  });
+  document.getElementById('admin-pass').value = '';
+  document.getElementById('admin-msg').textContent = '';
+  if (name === 'admin') renderAdmin();
+}
+
+function adminLogin() {
+  const p = document.getElementById('admin-pass').value;
+  if (p === ADMIN_PASSWORD) showScreen('admin');
+  else document.getElementById('admin-msg').textContent = 'Неверный пароль';
+}
+
+function createAccount() {
+  const nick = document.getElementById('new-nick').value.trim();
+  const pass = document.getElementById('new-pass').value;
+  const msg = document.getElementById('create-msg');
+  if (!nick || !pass) { msg.textContent = 'Заполните ник и пароль'; msg.className='msg err'; return; }
+  const accs = load();
+  if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) {
+    msg.textContent = 'Такой ник уже есть'; msg.className='msg err'; return;
+  }
+  accs.push({ nick, pass, balance: 0 });
+  save(accs);
+  document.getElementById('new-nick').value = '';
+  document.getElementById('new-pass').value = '';
+  msg.textContent = 'Счёт «' + nick + '» создан'; msg.className='msg ok';
+  renderAdmin();
+}
+
+function myLogin() {
+  const nick = document.getElementById('my-nick').value.trim();
+  const pass = document.getElementById('my-pass').value;
+  const msg = document.getElementById('my-msg');
+  const accs = load();
+  const acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (acc) {
+    currentNick = acc.nick;
+    showScreen('my');
+    updateCurrentScreen();
+  } else {
+    msg.textContent = 'Неверный ник или пароль';
+  }
+}
+
+function myLogout() {
+  currentNick = null;
+  showScreen('home');
+}
+
+function updateCurrentScreen() {
+  if (!currentNick) return;
+  const accs = load();
+  const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (acc) {
+    document.getElementById('my-title').textContent = 'Счёт: ' + acc.nick;
+    document.getElementById('my-balance').textContent = acc.balance + ' GC';
+  }
+}
+
+function doTransfer() {
+  const toNick = document.getElementById('tr-nick').value.trim();
+  const amount = parseFloat(document.getElementById('tr-amount').value);
+  const msg = document.getElementById('tr-msg');
+  if (!toNick || isNaN(amount) || amount <= 0) { msg.textContent = 'Неверная сумма или ник'; msg.className='msg err'; return; }
+  
+  const accs = load();
+  const fromAcc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  const toAcc = accs.find(a => a.nick.toLowerCase() === toNick.toLowerCase());
+  
+  if (!toAcc) { msg.textContent = 'Получатель не найден'; msg.className='msg err'; return; }
+  if (fromAcc.balance < amount) { msg.textContent = 'Недостаточно средств'; msg.className='msg err'; return; }
+  
+  fromAcc.balance = parseFloat((fromAcc.balance - amount).toFixed(2));
+  toAcc.balance = parseFloat((toAcc.balance + amount).toFixed(2));
+  
+  save(accs);
+  updateCurrentScreen();
+  document.getElementById('tr-nick').value = '';
+  document.getElementById('tr-amount').value = '';
+  msg.textContent = 'Перевод выполнен!'; msg.className='msg ok';
+}
+
+function deleteAccount(nick) {
+  if (!confirm('Удалить счёт ' + nick + '?')) return;
+  let accs = load();
+  accs = accs.filter(a => a.nick.toLowerCase() !== nick.toLowerCase());
+  save(accs);
+  renderAdmin();
+}
+
+function renderAdmin() {
+  const accs = load();
+  const list = document.getElementById('admin-list');
+  if (!list) return;
+  list.innerHTML = '';
+  accs.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'acct';
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between;">
+        <span class="name">${a.nick}</span>
+        <button class="del" onclick="deleteAccount('${a.nick}')">×</button>
+      </div>
+      <div class="bal">${a.balance} GC</div>
+      <div class="pw">Пароль: ${a.pass}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+window.updateCurrentScreen = updateCurrentScreen;
+</script>
+</body>
+</html>
