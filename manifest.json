@@ -9,10 +9,9 @@
   "id": "com.goldcoin.app",
   "icons": [
     {
-      "src": "https://pngall.com",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABmJLR0QA/wD/AP+gvae2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6QsRERUuC8yhyAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkZWx5ZQAADzBJREFUeNrtnXuMXVUVxr/1O/fO7Z25M9OZthRaSgtsxUdbioqKFYxECIQYhRij/IMYMfEHY4wSND4Q/zDGiInxDzUxRk0UEyM+idAQHwWloVBRWp7ttlN6z7xfe6//uGfO3O7cO3feM3fmTmfvT7Jp5t5zzt7rrO+u76y911oIpVAoSqUY9XzMhZpA84AmsKk7c8n2l01hM9isdFzGZqUzrHTGZ2aWz2V0PpdR2Sw2N9uWz29n383k7+byOdn87Pbn9/H2v9P5uX18f1Y2V7quK11gPjP7eX6W36/0+vVsnv+M368X8vP8vM6/P1e6/v3GfF4n2Wz+/XqB+fN5nb//M1/v32e+3rjPnF/nz5mvm3w//5y5evM5c3Xm6/n6yee6rnT9/w/p/+P8Z1zn10tndP2Pq2t9H0pnZHNd6QzzmdMZZmZmP1Pn5zM6v51Z+T7+/vmsrPV9lM5yOsvM9zVXP4P5u8z53/B3mfM/4z//9zn/+b//n//6n/6n/yljPq8x/3XGfM18/W/n+4/1ffH1v/+9fO24jGvHef61a9fxGZex7W/nM7OdsdkM5nNlZvs//y7zZ77m32H+DHM14+/P//k8v858vXGdXz/W98ZlXP/j6v6/0vW/P/H1/Lp/n7n65HP5ev9z7f9N1/Xj68fXZnS+PlPn+/j+/t/z//b/Fv+W/wb/79v/25iv+3fN1/+t7+vv5evH1/j/y5ivN77n3zf/+f/9v4/v+a/1/fN1/vXjMrP/vXzdf63Nf73xGZ+xfd183Xjd/z82/2/x/2b7f3v7/+1/p/PfZK4+0/5/fEbm6zPtf+vrfL3N19n2X2fbf222bW3X7dd1fX99fV+d31f/M1cff62t23Z9/TX+Wls3rht/nbn6+Gv8tTFfN97v57P5WpvPtmttPjNfb/O1Np+Zbdfa9k+xXTf+59j8v23/5GZsu3/M9p/Z/tP+uUz7LzPT/lP+uTzbf5Zp/2lm2n96pv2nmWn/qaZ+p2Xqv2f/fX59pmXy+xm/+9G/65b9s/e/v9a2v9bWf2ubf+24zLxGfH37tXbcfq0d/z9e+39r+6/N/o3P/m/x/+a/zf9b/L+9/f9l29YzfP34Gtf+17p+fGb9+Mzs39h8/Xjd968fX+f/jWv/G9f+V7b9r818fWb9l818fV7n13f9+rrP12e+PnP1yfvy9ZnrJ++rv9bm6yfvr68f6yfXt7/W/r/q+vHV2vz9v9Z/K8//W57t/7X/V/u/M/72u4x/13P/b/O7nH/Xc/+X/3P53f9/1//H1/9d/n/+M/7fxf/l//xfzX/+L+f/Xfzfzn/+r+b//l8u//u/TP73/7L/M9X+j1TrP9L//wAABNqjM+x5qgAAAAAElFTkSuQmCC",
+      "sizes": "128x128",
+      "type": "image/png"
     }
   ]
 }
