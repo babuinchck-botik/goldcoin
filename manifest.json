@@ -5,5 +5,14 @@
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#4f7cff",
-  "description": "Приложение для управления счетами GoldCoin"
+  "description": "Приложение для управления счетами GoldCoin",
+  "id": "com.goldcoin.app",
+  "icons": [
+    {
+      "src": "https://pngall.com",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
