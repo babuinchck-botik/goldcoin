@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Счета GoldCoin</title>
- <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 <style>
   * { box-sizing: border-box; }
   body {
@@ -40,6 +40,7 @@
   }
   .btn:hover { filter: brightness(1.12); }
   .btn.green { background: #2fae66; }
+  .btn.red { background: #d94e4e; }
   .btn.small { padding: 8px 12px; font-size: 13px; width: auto; margin: 0; }
   input {
     width: 100%;
@@ -52,7 +53,7 @@
     outline: none;
   }
   input:focus { border-color: #4f7cff; }
-  .row { display: flex; gap: 8px; align-items: center; }
+  .row { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
   .row input { flex: 1; margin: 0; }
   .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
   .err { color: #ff7b7b; }
@@ -65,13 +66,7 @@
   }
   .acct .name { font-weight: 700; font-size: 16px; }
   .acct .bal { color: #ffd166; margin: 4px 0; }
-  .pw { color: #9fb0c9; font-size: 13px; cursor: pointer; user-select: none; }
-  .newpw { display: flex; gap: 8px; margin-top: 8px; }
-  .newpw input { flex: 1; margin: 0; padding: 8px; font-size: 13px; }
-  .del {
-    background: none; border: none; color: #ff7b7b;
-    font-size: 18px; cursor: pointer; padding: 4px 8px;
-  }
+  .pw { color: #9fb0c9; font-size: 13px; user-select: none; }
   .balance-big {
     font-size: 34px; font-weight: 800; color: #ffd166;
     text-align: center; margin: 14px 0;
@@ -81,7 +76,10 @@
     cursor: pointer; font-size: 14px; padding: 6px 0; margin-bottom: 8px;
   }
   .hidden { display: none; }
-  .gold { color: #ffd166; }
+  .badge-blocked {
+    display: inline-block; padding: 2px 6px; font-size: 11px;
+    background: #d94e4e; color: #fff; border-radius: 6px; font-weight: bold;
+  }
 </style>
 
 <script type="module">
@@ -108,6 +106,12 @@
       if (typeof window.updateCurrentScreen === 'function') {
         window.updateCurrentScreen();
       }
+      if (typeof window.renderAdmin === 'function' && document.getElementById('screen-admin').classList.contains('hidden') === false) {
+        window.renderAdmin();
+      }
+      if (typeof window.renderPresident === 'function' && document.getElementById('screen-president').classList.contains('hidden') === false) {
+        window.renderPresident();
+      }
     }
   });
 
@@ -115,7 +119,7 @@
     try {
       const localData = JSON.parse(localStorage.getItem(STORE_KEY)) || [];
       await setDoc(doc(db, "database", "global_state"), { accounts: localData });
-      console.log("Данные синхронизированы!");
+      console.log("Данные синхронизированы с облаком!");
     } catch (e) {
       console.error("Ошибка синхронизации:", e);
     }
@@ -132,6 +136,7 @@
     <h1>💰 Счета GoldCoin</h1>
     <p class="sub">Добро пожаловать</p>
     <button class="btn" onclick="showScreen('admin-login')">🔐 Admin</button>
+    <button class="btn red" onclick="showScreen('pres-login')">👑 Президент</button>
     <button class="btn green" onclick="showScreen('my-login')">👤 Мой счёт</button>
   </div>
 
@@ -153,8 +158,28 @@
     <input id="new-pass" placeholder="Пароль">
     <button class="btn green" onclick="createAccount()">Создать счёт</button>
     <div class="msg" id="create-msg"></div>
-    <h3 style="margin:14px 0 6px;font-size:14px;">Счета</h3>
+    <h3 style="margin:14px 0 6px;font-size:14px;">Все счета</h3>
     <div id="admin-list"></div>
+  </div>
+
+  <!-- ВХОД ПРЕЗИДЕНТА -->
+  <div id="screen-pres-login" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Назад</button>
+    <h2>Вход для Президента</h2>
+    <input type="password" id="pres-pass" placeholder="Код Президента">
+    <button class="btn red" onclick="presLogin()">Управлять государством</button>
+    <div class="msg err" id="pres-msg"></div>
+  </div>
+
+  <!-- ПАНЕЛЬ ПРЕЗИДЕНТА -->
+  <div id="screen-president" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Выйти</button>
+    <h2>👑 Панель Президента</h2>
+    
+    <h3 style="margin:14px 0 6px;font-size:14px;">Поиск и блокировка счетов</h3>
+    <input id="pres-search" placeholder="Введите ник для поиска..." oninput="renderPresident()">
+    
+    <div id="pres-list"></div>
   </div>
 
   <!-- ВХОД ПОЛЬЗОВАТЕЛЯ -->
@@ -183,6 +208,7 @@
 </div>
 <script>
 const ADMIN_PASSWORD = '666306227666';
+const PRES_PASSWORD = '777'; // Секретный пароль Президента
 const STORE_KEY = 'goldcoin_accounts_v1';
 let currentNick = null;
 
@@ -198,20 +224,49 @@ function save(accs) {
   }
 }
 
+// Проверка блокировки пользователя (true - заблокирован, false - свободен)
+function isAccountBlocked(acc) {
+  if (!acc.blockedUntil) return false;
+  const now = new Date().getTime();
+  if (now < acc.blockedUntil) {
+    return true;
+  }
+  return false;
+}
+
+// Подсчет оставшихся часов блокировки
+function getRemainingBlockedHours(acc) {
+  if (!acc.blockedUntil) return 0;
+  const now = new Date().getTime();
+  const diff = acc.blockedUntil - now;
+  if (diff <= 0) return 0;
+  return (diff / (1000 * 60 * 60)).toFixed(1);
+}
+
 function showScreen(name) {
-  ['home','admin-login','admin','my-login','my'].forEach(s => {
+  ['home','admin-login','admin','pres-login','president','my-login','my'].forEach(s => {
     const el = document.getElementById('screen-'+s);
     if(el) el.classList.toggle('hidden', s !== name);
   });
   document.getElementById('admin-pass').value = '';
   document.getElementById('admin-msg').textContent = '';
+  document.getElementById('pres-pass').value = '';
+  document.getElementById('pres-msg').textContent = '';
+  
   if (name === 'admin') renderAdmin();
+  if (name === 'president') renderPresident();
 }
 
 function adminLogin() {
   const p = document.getElementById('admin-pass').value;
   if (p === ADMIN_PASSWORD) showScreen('admin');
   else document.getElementById('admin-msg').textContent = 'Неверный пароль';
+}
+
+function presLogin() {
+  const p = document.getElementById('pres-pass').value;
+  if (p === PRES_PASSWORD) showScreen('president');
+  else document.getElementById('pres-msg').textContent = 'Неверный код Президента';
 }
 
 function createAccount() {
@@ -223,7 +278,8 @@ function createAccount() {
   if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) {
     msg.textContent = 'Такой ник уже есть'; msg.className='msg err'; return;
   }
-  accs.push({ nick, pass, balance: 0 });
+  // Добавляем аккаунт (balance: 0, blockedUntil: null)
+  accs.push({ nick, pass, balance: 0, blockedUntil: null });
   save(accs);
   document.getElementById('new-nick').value = '';
   document.getElementById('new-pass').value = '';
@@ -237,7 +293,12 @@ function myLogin() {
   const msg = document.getElementById('my-msg');
   const accs = load();
   const acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  
   if (acc) {
+    if (isAccountBlocked(acc)) {
+      msg.textContent = `Ваш счёт заблокирован Президентом! Осталось: ${getRemainingBlockedHours(acc)} ч.`;
+      return;
+    }
     currentNick = acc.nick;
     showScreen('my');
     updateCurrentScreen();
@@ -256,6 +317,11 @@ function updateCurrentScreen() {
   const accs = load();
   const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
   if (acc) {
+    if (isAccountBlocked(acc)) {
+      alert(`Ваш счёт был заблокирован!`);
+      myLogout();
+      return;
+    }
     document.getElementById('my-title').textContent = 'Счёт: ' + acc.nick;
     document.getElementById('my-balance').textContent = acc.balance + ' GC';
   }
@@ -271,6 +337,7 @@ function doTransfer() {
   const fromAcc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
   const toAcc = accs.find(a => a.nick.toLowerCase() === toNick.toLowerCase());
   
+  if (isAccountBlocked(fromAcc)) { msg.textContent = 'Ваш счёт заблокирован!'; msg.className='msg err'; return; }
   if (!toAcc) { msg.textContent = 'Получатель не найден'; msg.className='msg err'; return; }
   if (fromAcc.balance < amount) { msg.textContent = 'Недостаточно средств'; msg.className='msg err'; return; }
   
@@ -292,26 +359,115 @@ function deleteAccount(nick) {
   renderAdmin();
 }
 
+// НАЧИСЛЕНИЕ ДЕНЕГ АДМИНОМ
+function addMoney(idx) {
+  const amountInput = document.getElementById(`input-${idx}`);
+  const amount = parseFloat(amountInput.value);
+  if (isNaN(amount) || amount <= 0) {
+    alert('Введите корректную сумму больше 0');
+    return;
+  }
+  const accs = load();
+  accs[idx].balance = parseFloat((accs[idx].balance + amount).toFixed(2));
+  save(accs);
+  renderAdmin();
+}
+
 function renderAdmin() {
   const accs = load();
   const list = document.getElementById('admin-list');
   if (!list) return;
   list.innerHTML = '';
-  accs.forEach(a => {
+  accs.forEach((a, idx) => {
     const div = document.createElement('div');
     div.className = 'acct';
+    const blockedLabel = isAccountBlocked(a) ? ` <span class="badge-blocked">БАН (${getRemainingBlockedHours(a)}ч)</span>` : '';
     div.innerHTML = `
-      <div style="display:flex; justify-content:space-between;">
-        <span class="name">${a.nick}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="name">${a.nick}${blockedLabel}</span>
         <button class="del" onclick="deleteAccount('${a.nick}')">×</button>
       </div>
       <div class="bal">${a.balance} GC</div>
-      <div class="pw">Пароль: ${a.pass}</div>
+      <div class="pw" style="margin-bottom:8px;">Пароль: ${a.pass}</div>
+      <div class="row">
+        <input type="number" id="input-${idx}" step="0.01" placeholder="Сумма">
+        <button class="btn small green" onclick="addMoney(${idx})">+ Начислить</button>
+      </div>
     `;
     list.appendChild(div);
   });
 }
 
+// ПАНЕЛЬ ПРЕЗИДЕНТА: ПОИСК И БЛОКИРОВКА СЧЕТОВ
+function renderPresident() {
+  const accs = load();
+  const list = document.getElementById('pres-list');
+  const query = document.getElementById('pres-search').value.toLowerCase().trim();
+  if (!list) return;
+  list.innerHTML = '';
+
+  accs.forEach((a, idx) => {
+    // Фильтр строки поиска по нику
+    if (query && !a.nick.toLowerCase().includes(query)) return;
+
+    const div = document.createElement('div');
+    div.className = 'acct';
+    
+    const blocked = isAccountBlocked(a);
+    let blockStatusHtml = '';
+    
+    if (blocked) {
+      blockStatusHtml = `
+        <div class="msg err" style="margin:4px 0;">Заблокирован! Осталось: ${getRemainingBlockedHours(a)} ч.</div>
+        <button class="btn small green" style="width:100%;margin-top:6px;" onclick="unblockAccount(${idx})">🔓 Разблокировать сейчас</button>
+      `;
+    } else {
+      blockStatusHtml = `
+        <div class="row">
+          <input type="number" id="block-time-${idx}" min="1" placeholder="Срок (в часах)">
+          <button class="btn small red" onclick="blockAccount(${idx})">⛔ Забанить</button>
+        </div>
+      `;
+    }
+
+    div.innerHTML = `
+      <div class="name">👑 Пользователь: ${a.nick}</div>
+      <div class="bal">Баланс: ${a.balance} GC</div>
+      ${blockStatusHtml}
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ФУНКЦИЯ БЛОКИРОВКИ ПРЕЗИДЕНТОМ
+function blockAccount(idx) {
+  const hoursInput = document.getElementById(`block-time-${idx}`);
+  const hours = parseFloat(hoursInput.value);
+  if (isNaN(hours) || hours <= 0) {
+    alert('Введите количество часов блокировки (больше 0)');
+    return;
+  }
+  const accs = load();
+  const blockUntilTimestamp = new Date().getTime() + (hours * 60 * 60 * 1000);
+  accs[idx].blockedUntil = blockUntilTimestamp;
+  
+  save(accs);
+  renderPresident();
+}
+
+// ФУНКЦИЯ РАЗБЛОКИРОВКИ
+function unblockAccount(idx) {
+  const accs = load();
+  accs[idx].blockedUntil = null;
+  save(accs);
+  renderPresident();
+}
+
+window.renderAdmin = renderAdmin;
+window.renderPresident = renderPresident;
+window.addMoney = addMoney;
+window.blockAccount = blockAccount;
+window.unblockAccount = unblockAccount;
 window.updateCurrentScreen = updateCurrentScreen;
 </script>
 </body>
