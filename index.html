@@ -106,10 +106,10 @@
       if (typeof window.updateCurrentScreen === 'function') {
         window.updateCurrentScreen();
       }
-      if (typeof window.renderAdmin === 'function' && document.getElementById('screen-admin').classList.contains('hidden') === false) {
+      if (typeof window.renderAdmin === 'function' && !document.getElementById('screen-admin').classList.contains('hidden')) {
         window.renderAdmin();
       }
-      if (typeof window.renderPresident === 'function' && document.getElementById('screen-president').classList.contains('hidden') === false) {
+      if (typeof window.renderPresident === 'function' && !document.getElementById('screen-president').classList.contains('hidden')) {
         window.renderPresident();
       }
     }
@@ -119,9 +119,9 @@
     try {
       const localData = JSON.parse(localStorage.getItem(STORE_KEY)) || [];
       await setDoc(doc(db, "database", "global_state"), { accounts: localData });
-      console.log("Данные синхронизированы с облаком!");
+      console.log("Данные успешно улетели в облако Firebase!");
     } catch (e) {
-      console.error("Ошибка синхронизации:", e);
+      console.error("Ошибка отправки данных:", e);
     }
   }
 
@@ -175,10 +175,8 @@
   <div id="screen-president" class="hidden">
     <button class="back" onclick="showScreen('home')">← Выйти</button>
     <h2>👑 Панель Президента</h2>
-    
     <h3 style="margin:14px 0 6px;font-size:14px;">Поиск и блокировка счетов</h3>
     <input id="pres-search" placeholder="Введите ник для поиска..." oninput="renderPresident()">
-    
     <div id="pres-list"></div>
   </div>
 
@@ -208,7 +206,7 @@
 </div>
 <script>
 const ADMIN_PASSWORD = '666306227666';
-const PRES_PASSWORD = '777'; // Секретный пароль Президента
+const PRES_PASSWORD = '777'; 
 const STORE_KEY = 'goldcoin_accounts_v1';
 let currentNick = null;
 
@@ -224,21 +222,14 @@ function save(accs) {
   }
 }
 
-// Проверка блокировки пользователя (true - заблокирован, false - свободен)
 function isAccountBlocked(acc) {
   if (!acc.blockedUntil) return false;
-  const now = new Date().getTime();
-  if (now < acc.blockedUntil) {
-    return true;
-  }
-  return false;
+  return new Date().getTime() < acc.blockedUntil;
 }
 
-// Подсчет оставшихся часов блокировки
 function getRemainingBlockedHours(acc) {
   if (!acc.blockedUntil) return 0;
-  const now = new Date().getTime();
-  const diff = acc.blockedUntil - now;
+  const diff = acc.blockedUntil - new Date().getTime();
   if (diff <= 0) return 0;
   return (diff / (1000 * 60 * 60)).toFixed(1);
 }
@@ -278,7 +269,6 @@ function createAccount() {
   if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) {
     msg.textContent = 'Такой ник уже есть'; msg.className='msg err'; return;
   }
-  // Добавляем аккаунт (balance: 0, blockedUntil: null)
   accs.push({ nick, pass, balance: 0, blockedUntil: null });
   save(accs);
   document.getElementById('new-nick').value = '';
@@ -307,6 +297,7 @@ function myLogin() {
   }
 }
 
+// ВЫХОД ИЗ ЛИЧНОГО КАБИНЕТА
 function myLogout() {
   currentNick = null;
   showScreen('home');
@@ -359,7 +350,6 @@ function deleteAccount(nick) {
   renderAdmin();
 }
 
-// НАЧИСЛЕНИЕ ДЕНЕГ АДМИНОМ
 function addMoney(idx) {
   const amountInput = document.getElementById(`input-${idx}`);
   const amount = parseFloat(amountInput.value);
@@ -398,7 +388,6 @@ function renderAdmin() {
   });
 }
 
-// ПАНЕЛЬ ПРЕЗИДЕНТА: ПОИСК И БЛОКИРОВКА СЧЕТОВ
 function renderPresident() {
   const accs = load();
   const list = document.getElementById('pres-list');
@@ -407,7 +396,6 @@ function renderPresident() {
   list.innerHTML = '';
 
   accs.forEach((a, idx) => {
-    // Фильтр строки поиска по нику
     if (query && !a.nick.toLowerCase().includes(query)) return;
 
     const div = document.createElement('div');
@@ -439,7 +427,6 @@ function renderPresident() {
   });
 }
 
-// ФУНКЦИЯ БЛОКИРОВКИ ПРЕЗИДЕНТОМ
 function blockAccount(idx) {
   const hoursInput = document.getElementById(`block-time-${idx}`);
   const hours = parseFloat(hoursInput.value);
@@ -450,12 +437,10 @@ function blockAccount(idx) {
   const accs = load();
   const blockUntilTimestamp = new Date().getTime() + (hours * 60 * 60 * 1000);
   accs[idx].blockedUntil = blockUntilTimestamp;
-  
   save(accs);
   renderPresident();
 }
 
-// ФУНКЦИЯ РАЗБЛОКИРОВКИ
 function unblockAccount(idx) {
   const accs = load();
   accs[idx].blockedUntil = null;
