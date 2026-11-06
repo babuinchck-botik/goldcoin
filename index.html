@@ -41,8 +41,9 @@
   .btn:hover { filter: brightness(1.12); }
   .btn.green { background: #2fae66; }
   .btn.red { background: #d94e4e; }
+  .btn.orange { background: #f39c12; }
   .btn.small { padding: 8px 12px; font-size: 13px; width: auto; margin: 0; }
-  input {
+  input, select {
     width: 100%;
     padding: 12px; margin: 6px 0;
     font-size: 15px;
@@ -52,13 +53,14 @@
     color: #fff;
     outline: none;
   }
-  input:focus { border-color: #4f7cff; }
+  input:focus, select:focus { border-color: #4f7cff; }
+  select option { background: #16213e; color: #fff; }
   .row { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
-  .row input { flex: 1; margin: 0; }
+  .row input, .row select { flex: 1; margin: 0; }
   .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
   .err { color: #ff7b7b; }
   .ok { color: #6ee7a0; }
-  .acct {
+  .acct, .noti-item {
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 12px;
@@ -66,7 +68,7 @@
   }
   .acct .name { font-weight: 700; font-size: 16px; }
   .acct .bal { color: #ffd166; margin: 4px 0; }
-  .pw { color: #9fb0c9; font-size: 13px; user-select: none; }
+  .pw, .salary-info { color: #9fb0c9; font-size: 13px; }
   .balance-big {
     font-size: 34px; font-weight: 800; color: #ffd166;
     text-align: center; margin: 14px 0;
@@ -81,6 +83,7 @@
     background: #d94e4e; color: #fff; border-radius: 6px; font-weight: bold;
   }
 </style>
+
 <script type="module">
   import { initializeApp } from "https://gstatic.com";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://gstatic.com";
@@ -94,33 +97,29 @@
     appId: "1:587303464356:web:72adddaef46fde263ca531"
   };
 
-
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const STORE_KEY = 'goldcoin_accounts_v1';
+  const STORE_KEY = 'goldcoin_accounts_v2';
 
   onSnapshot(doc(db, "database", "global_state"), (docSnap) => {
     if (docSnap.exists()) {
       const cloudData = docSnap.data().accounts || [];
+      const cloudNotis = docSnap.data().notifications || [];
       localStorage.setItem(STORE_KEY, JSON.stringify(cloudData));
-      if (typeof window.updateCurrentScreen === 'function') {
-        window.updateCurrentScreen();
-      }
-      if (typeof window.renderAdmin === 'function' && !document.getElementById('screen-admin').classList.contains('hidden')) {
-        window.renderAdmin();
-      }
-      if (typeof window.renderPresident === 'function' && !document.getElementById('screen-president').classList.contains('hidden')) {
-        window.renderPresident();
-      }
+      localStorage.setItem(STORE_KEY + '_notis', JSON.stringify(cloudNotis));
+      
+      if (typeof window.updateCurrentScreen === 'function') window.updateCurrentScreen();
+      if (typeof window.renderAdmin === 'function' && !document.getElementById('screen-admin').classList.contains('hidden')) window.renderAdmin();
+      if (typeof window.renderPresident === 'function' && !document.getElementById('screen-president').classList.contains('hidden')) window.renderPresident();
     }
   });
 
   async function syncToCloud() {
     try {
       const localData = JSON.parse(localStorage.getItem(STORE_KEY)) || [];
-      await setDoc(doc(db, "database", "global_state"), { accounts: localData });
-      console.log("Данные успешно улетели в облако Firebase!");
+      const localNotis = JSON.parse(localStorage.getItem(STORE_KEY + '_notis')) || [];
+      await setDoc(doc(db, "database", "global_state"), { accounts: localData, notifications: localNotis });
+      console.log("Данные успешно синхронизированы с облаком Firebase!");
     } catch (e) {
       console.error("Ошибка отправки данных:", e);
     }
@@ -135,7 +134,7 @@
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <div id="screen-home">
     <h1>💰 Счета GoldCoin</h1>
-    <p class="sub">Добро пожаловать</p>
+    <p class="sub">Система Зарплат и Премий</p>
     <button class="btn" onclick="showScreen('admin-login')">🔐 Admin</button>
     <button class="btn red" onclick="showScreen('pres-login')">👑 Президент</button>
     <button class="btn green" onclick="showScreen('my-login')">👤 Мой счёт</button>
@@ -176,7 +175,11 @@
   <div id="screen-president" class="hidden">
     <button class="back" onclick="showScreen('home')">← Выйти</button>
     <h2>👑 Панель Президента</h2>
-    <h3 style="margin:14px 0 6px;font-size:14px;">Поиск и блокировка счетов</h3>
+    
+    <h3 style="margin:14px 0 6px;font-size:14px;">🔔 Уведомления о премиях</h3>
+    <div id="pres-notifications" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
+
+    <h3 style="margin:14px 0 6px;font-size:14px;">Поиск, блокировка и зарплаты</h3>
     <input id="pres-search" placeholder="Введите ник для поиска..." oninput="renderPresident()">
     <div id="pres-list"></div>
   </div>
@@ -195,8 +198,12 @@
   <div id="screen-my" class="hidden">
     <button class="back" onclick="myLogout()">← Выйти</button>
     <h2 id="my-title">Счёт</h2>
-    <div class="balance-big" id="my-balance"></div>
-    <p class="sub">Ваш баланс в goldcoin</p>
+    <div class="balance-big" id="my-balance">0 GC</div>
+    <p class="sub" id="my-salary-desc" style="margin-bottom:2px;">Заработок не настроен</p>
+    <div class="msg" id="bonus-msg"></div>
+    
+    <button class="btn orange" onclick="requestBonus()" style="margin-bottom: 20px;">🎯 Потребовать премию</button>
+
     <h3 style="margin:14px 0 6px;font-size:14px;">Перевести</h3>
     <input id="tr-nick" placeholder="Ник получателя">
     <input id="tr-amount" type="number" min="0" step="0.01" placeholder="Сумма в goldcoin">
@@ -208,8 +215,9 @@
 <script>
 const ADMIN_PASSWORD = '666306227666';
 const PRES_PASSWORD = '777'; 
-const STORE_KEY = 'goldcoin_accounts_v1';
+const STORE_KEY = 'goldcoin_accounts_v2';
 let currentNick = null;
+let salaryInterval = null;
 
 function load() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
@@ -218,9 +226,17 @@ function load() {
 
 function save(accs) { 
   localStorage.setItem(STORE_KEY, JSON.stringify(accs)); 
-  if (typeof window.syncToCloud === 'function') {
-    window.syncToCloud();
-  }
+  if (typeof window.syncToCloud === 'function') window.syncToCloud();
+}
+
+function loadNotis() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY + '_notis')) || []; }
+  catch(e) { return []; }
+}
+
+function saveNotis(notis) {
+  localStorage.setItem(STORE_KEY + '_notis', JSON.stringify(notis));
+  if (typeof window.syncToCloud === 'function') window.syncToCloud();
 }
 
 function isAccountBlocked(acc) {
@@ -235,15 +251,49 @@ function getRemainingBlockedHours(acc) {
   return (diff / (1000 * 60 * 60)).toFixed(1);
 }
 
+// Запуск фонового начисления тикающей зарплаты каждую секунду
+function startSalaryTicker() {
+  if (salaryInterval) clearInterval(salaryInterval);
+  salaryInterval = setInterval(() => {
+    if (!currentNick) return;
+    const accs = load();
+    const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+    if (!acc || !acc.salary || acc.salary <= 0 || isAccountBlocked(acc)) return;
+
+    const now = new Date().getTime();
+    if (!acc.lastSalaryUpdate) acc.lastSalaryUpdate = now;
+    
+    const diffSeconds = (now - acc.lastSalaryUpdate) / 1000;
+    if (diffSeconds <= 0) return;
+
+    let periodSeconds = 1;
+    if (acc.salaryPeriod === 'minute') periodSeconds = 60;
+    if (acc.salaryPeriod === 'hour') periodSeconds = 3600;
+    if (acc.salaryPeriod === 'day') periodSeconds = 86400;
+    if (acc.salaryPeriod === 'week') periodSeconds = 604800;
+    if (acc.salaryPeriod === 'year') periodSeconds = 31536000;
+
+    const earned = (acc.salary / periodSeconds) * diffSeconds;
+    acc.balance = parseFloat((acc.balance + earned).toFixed(5));
+    acc.lastSalaryUpdate = now;
+
+    localStorage.setItem(STORE_KEY, JSON.stringify(accs));
+    
+    const balEl = document.getElementById('my-balance');
+    if (balEl) balEl.textContent = parseFloat(acc.balance.toFixed(2)) + ' GC';
+  }, 1000);
+}
+
+function pushTickerToCloud() {
+  const accs = load();
+  save(accs);
+}
 function showScreen(name) {
   ['home','admin-login','admin','pres-login','president','my-login','my'].forEach(s => {
     const el = document.getElementById('screen-'+s);
     if(el) el.classList.toggle('hidden', s !== name);
   });
-  document.getElementById('admin-pass').value = '';
-  document.getElementById('admin-msg').textContent = '';
-  document.getElementById('pres-pass').value = '';
-  document.getElementById('pres-msg').textContent = '';
+  if (name !== 'my' && salaryInterval) clearInterval(salaryInterval);
   
   if (name === 'admin') renderAdmin();
   if (name === 'president') renderPresident();
@@ -270,7 +320,7 @@ function createAccount() {
   if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) {
     msg.textContent = 'Такой ник уже есть'; msg.className='msg err'; return;
   }
-  accs.push({ nick, pass, balance: 0, blockedUntil: null });
+  accs.push({ nick, pass, balance: 0, blockedUntil: null, salary: 0, salaryPeriod: 'hour', lastSalaryUpdate: null });
   save(accs);
   document.getElementById('new-nick').value = '';
   document.getElementById('new-pass').value = '';
@@ -291,16 +341,20 @@ function myLogin() {
       return;
     }
     currentNick = acc.nick;
+    acc.lastSalaryUpdate = new Date().getTime();
+    localStorage.setItem(STORE_KEY, JSON.stringify(accs));
     showScreen('my');
     updateCurrentScreen();
+    startSalaryTicker();
   } else {
     msg.textContent = 'Неверный ник или пароль';
   }
 }
 
-// ВЫХОД ИЗ ЛИЧНОГО КАБИНЕТА
 function myLogout() {
+  pushTickerToCloud();
   currentNick = null;
+  if (salaryInterval) clearInterval(salaryInterval);
   showScreen('home');
 }
 
@@ -315,11 +369,36 @@ function updateCurrentScreen() {
       return;
     }
     document.getElementById('my-title').textContent = 'Счёт: ' + acc.nick;
-    document.getElementById('my-balance').textContent = acc.balance + ' GC';
+    document.getElementById('my-balance').textContent = parseFloat(acc.balance.toFixed(2)) + ' GC';
+    
+    const desc = document.getElementById('my-salary-desc');
+    if (acc.salary && acc.salary > 0) {
+      const pText = { second:'секунду', minute:'минуту', hour:'час', day:'день', week:'неделю', year:'год' }[acc.salaryPeriod];
+      desc.textContent = `Зарплата: ${acc.salary} GC каждую ${pText} (начисляется)`;
+    } else {
+      desc.textContent = 'Заработок не настроен';
+    }
   }
 }
 
+function requestBonus() {
+  const sum = parseFloat(prompt('Какую сумму премии вы хотите потребовать у Президента (в GC)?'));
+  const msg = document.getElementById('bonus-msg');
+  if (isNaN(sum) || sum <= 0) {
+    msg.textContent = 'Введите корректную сумму!'; msg.className = 'msg err'; return;
+  }
+  pushTickerToCloud();
+  
+  const notis = loadNotis();
+  notis.push({ id: new Date().getTime(), from: currentNick, amount: sum });
+  saveNotis(notis);
+  
+  msg.textContent = `Запрос на премию в размере ${sum} GC отправлен Президентом!`;
+  msg.className = 'msg ok';
+}
+
 function doTransfer() {
+  pushTickerToCloud();
   const toNick = document.getElementById('tr-nick').value.trim();
   const amount = parseFloat(document.getElementById('tr-amount').value);
   const msg = document.getElementById('tr-msg');
@@ -342,7 +421,6 @@ function doTransfer() {
   document.getElementById('tr-amount').value = '';
   msg.textContent = 'Перевод выполнен!'; msg.className='msg ok';
 }
-
 function deleteAccount(nick) {
   if (!confirm('Удалить счёт ' + nick + '?')) return;
   let accs = load();
@@ -354,10 +432,7 @@ function deleteAccount(nick) {
 function addMoney(idx) {
   const amountInput = document.getElementById(`input-${idx}`);
   const amount = parseFloat(amountInput.value);
-  if (isNaN(amount) || amount <= 0) {
-    alert('Введите корректную сумму больше 0');
-    return;
-  }
+  if (isNaN(amount) || amount <= 0) { alert('Введите корректную сумму больше 0'); return; }
   const accs = load();
   accs[idx].balance = parseFloat((accs[idx].balance + amount).toFixed(2));
   save(accs);
@@ -378,7 +453,7 @@ function renderAdmin() {
         <span class="name">${a.nick}${blockedLabel}</span>
         <button class="del" onclick="deleteAccount('${a.nick}')">×</button>
       </div>
-      <div class="bal">${a.balance} GC</div>
+      <div class="bal">${parseFloat(a.balance.toFixed(2))} GC</div>
       <div class="pw" style="margin-bottom:8px;">Пароль: ${a.pass}</div>
       <div class="row">
         <input type="number" id="input-${idx}" step="0.01" placeholder="Сумма">
@@ -391,11 +466,32 @@ function renderAdmin() {
 
 function renderPresident() {
   const accs = load();
+  const notis = loadNotis();
   const list = document.getElementById('pres-list');
+  const notiList = document.getElementById('pres-notifications');
   const query = document.getElementById('pres-search').value.toLowerCase().trim();
+  
+  if (notiList) {
+    notiList.innerHTML = '';
+    if (notis.length === 0) {
+      notiList.innerHTML = '<p class="sub" style="margin:0; text-align:left;">Нет новых запросов</p>';
+    }
+    notis.forEach(n => {
+      const div = document.createElement('div');
+      div.className = 'noti-item';
+      div.innerHTML = `
+        <div style="font-size:14px; margin-bottom: 6px;"><b>${n.from}</b> требует премию <b>${n.amount} GC</b></div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn small green" onclick="approveBonus(${n.id})">Одобрить</button>
+          <button class="btn small red" onclick="rejectBonus(${n.id})">Отклонить</button>
+        </div>
+      `;
+      notiList.appendChild(div);
+    });
+  }
+
   if (!list) return;
   list.innerHTML = '';
-
   accs.forEach((a, idx) => {
     if (query && !a.nick.toLowerCase().includes(query)) return;
 
@@ -403,41 +499,84 @@ function renderPresident() {
     div.className = 'acct';
     
     const blocked = isAccountBlocked(a);
-    let blockStatusHtml = '';
-    
-    if (blocked) {
-      blockStatusHtml = `
-        <div class="msg err" style="margin:4px 0;">Заблокирован! Осталось: ${getRemainingBlockedHours(a)} ч.</div>
-        <button class="btn small green" style="width:100%;margin-top:6px;" onclick="unblockAccount(${idx})">🔓 Разблокировать сейчас</button>
-      `;
-    } else {
-      blockStatusHtml = `
-        <div class="row">
-          <input type="number" id="block-time-${idx}" min="1" placeholder="Срок (в часах)">
-          <button class="btn small red" onclick="blockAccount(${idx})">⛔ Забанить</button>
-        </div>
-      `;
-    }
+    let blockStatusHtml = blocked ? 
+      `<div class="msg err" style="margin:4px 0;">Заблокирован! Осталось: ${getRemainingBlockedHours(a)} ч.</div>
+       <button class="btn small green" style="width:100%;margin-top:6px;" onclick="unblockAccount(${idx})">🔓 Разблокировать сейчас</button>` :
+      `<div class="row">
+         <input type="number" id="block-time-${idx}" min="1" placeholder="Срок (в часах)">
+         <button class="btn small red" onclick="blockAccount(${idx})">⛔ Забанить</button>
+       </div>`;
+
+    const pText = a.salary ? { second:'сек', minute:'мин', hour:'час', day:'день', week:'нед', year:'год' }[a.salaryPeriod] : 'не настроена';
+    const currentSalStr = a.salary ? `${a.salary} GC / ${pText}` : 'Нет';
 
     div.innerHTML = `
       <div class="name">👑 Пользователь: ${a.nick}</div>
-      <div class="bal">Баланс: ${a.balance} GC</div>
+      <div class="bal">Баланс: ${parseFloat(a.balance.toFixed(2))} GC</div>
+      <div class="salary-info" style="margin-bottom:8px;">Текущая зарплата: <b>${currentSalStr}</b></div>
+      
+      <div class="row" style="margin-bottom:10px;">
+        <input type="number" id="sal-amount-${idx}" step="0.01" placeholder="Размер з/п">
+        <select id="sal-period-${idx}">
+          <option value="second">Каждую секунду</option>
+          <option value="minute">Каждую минуту</option>
+          <option value="hour" selected>Каждый час</option>
+          <option value="day">Каждый день</option>
+          <option value="week">Каждую неделю</option>
+          <option value="year">Каждый год</option>
+        </select>
+        <button class="btn small green" onclick="setSalary(${idx})">💰 Назначить</button>
+      </div>
       ${blockStatusHtml}
     `;
     list.appendChild(div);
   });
 }
 
-function blockAccount(idx) {
-  const hoursInput = document.getElementById(`block-time-${idx}`);
-  const hours = parseFloat(hoursInput.value);
-  if (isNaN(hours) || hours <= 0) {
-    alert('Введите количество часов блокировки (больше 0)');
-    return;
-  }
+function setSalary(idx) {
+  const val = parseFloat(document.getElementById(`sal-amount-${idx}`).value);
+  const period = document.getElementById(`sal-period-${idx}`).value;
+  if (isNaN(val) || val < 0) { alert('Введите корректную сумму зарплаты'); return; }
+  
   const accs = load();
-  const blockUntilTimestamp = new Date().getTime() + (hours * 60 * 60 * 1000);
-  accs[idx].blockedUntil = blockUntilTimestamp;
+  accs[idx].salary = val;
+  accs[idx].salaryPeriod = period;
+  accs[idx].lastSalaryUpdate = new Date().getTime();
+  save(accs);
+  renderPresident();
+}
+
+function approveBonus(notiId) {
+  let notis = loadNotis();
+  const noti = notis.find(n => n.id === notiId);
+  if (!noti) return;
+
+  const accs = load();
+  const acc = accs.find(a => a.nick.toLowerCase() === noti.from.toLowerCase());
+  if (acc) {
+    acc.balance = parseFloat((acc.balance + noti.amount).toFixed(2));
+    save(accs);
+  }
+  
+  notis = notis.filter(n => n.id !== notiId);
+  saveNotis(notis);
+  renderPresident();
+  alert('Премия успешно выдана!');
+}
+
+function rejectBonus(notiId) {
+  let notis = loadNotis();
+  notis = notis.filter(n => n.id !== notiId);
+  saveNotis(notis);
+  renderPresident();
+  alert('Запрос на премию отклонён.');
+}
+
+function blockAccount(idx) {
+  const hours = parseFloat(document.getElementById(`block-time-${idx}`).value);
+  if (isNaN(hours) || hours <= 0) { alert('Введите количество часов блокировки'); return; }
+  const accs = load();
+  accs[idx].blockedUntil = new Date().getTime() + (hours * 60 * 60 * 1000);
   save(accs);
   renderPresident();
 }
@@ -455,6 +594,9 @@ window.addMoney = addMoney;
 window.blockAccount = blockAccount;
 window.unblockAccount = unblockAccount;
 window.updateCurrentScreen = updateCurrentScreen;
+window.setSalary = setSalary;
+window.approveBonus = approveBonus;
+window.rejectBonus = rejectBonus;
 </script>
 </body>
 </html>
