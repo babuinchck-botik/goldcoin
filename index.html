@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Счета GoldCoin</title>
+<title>Город</title>
 <link rel="manifest" href="manifest.json">
 <style>
   * { box-sizing: border-box; }
@@ -19,75 +19,209 @@
   }
   .card {
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 16px;
     padding: 24px;
     height: fit-content;
+    position: relative;
   }
   h1 { font-size: 22px; margin: 0 0 6px; text-align: center; }
   h2 { font-size: 17px; margin: 18px 0 10px; }
+  h3 { font-size: 14px; margin: 16px 0 6px; }
   .sub { text-align: center; color: #9fb0c9; font-size: 13px; margin: 0 0 18px; }
   .btn {
-    display: block; width: 100%;
-    padding: 14px; margin: 10px 0;
-    font-size: 16px; font-weight: 600;
-    border: none; border-radius: 12px;
-    cursor: pointer;
-    background: #4f7cff; color: #fff;
-    transition: filter .15s;
+    display: block; width: 100%; padding: 13px; margin: 8px 0;
+    font-size: 15px; font-weight: 600; border: none; border-radius: 12px;
+    cursor: pointer; background: #4f7cff; color: #fff;
+    transition: filter .15s, transform .1s;
   }
   .btn:hover { filter: brightness(1.12); }
+  .btn:active { transform: scale(0.98); }
   .btn.green { background: #2fae66; }
   .btn.red { background: #d94e4e; }
   .btn.orange { background: #f39c12; }
+  .btn.police { background: #2b4c7e; border: 1px solid #4f7cff; }
+  .btn.bank { background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: #fff; }
+  .btn.church { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); border: 1px solid #fbbf24; color: #fff; }
+  .btn.court { background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); border: 1px solid #f87171; color: #fff; }
+  .btn.elder { background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); border: 1px solid #818cf8; color: #fff; }
+  .btn.football { background: linear-gradient(135deg, #15803d 0%, #166534 100%); border: 1px solid #4ade80; color: #fff; }
+  .btn.casino { background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%); border: 1px solid #facc15; color: #fff; }
+  .btn.holiday { background: linear-gradient(135deg, #db2777 0%, #9d174d 100%); color: #fff; }
+  .btn.mint { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); color: #fff; }
+  .btn.hospital { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
+  .btn.edu { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: #fff; }
+  .btn.army { background: linear-gradient(135deg, #3f6212 0%, #1a2e05 100%); border: 1px solid #84cc16; color: #fff; }
+  .btn.war { background: linear-gradient(135deg, #991b1b 0%, #450a0a 100%); border: 1px solid #ef4444; color: #fff; }
+  .btn.ogurchik { background: linear-gradient(135deg, #c026d3 0%, #701a75 100%); border: 1px solid #f0abfc; color: #fff; }
+  .btn.gavisha { background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%); color: #fff; }
+  .btn.bns { background: linear-gradient(135deg, #ea580c 0%, #9a3412 100%); color: #fff; }
+  .btn.darkops { background: linear-gradient(135deg, #334155 0%, #0f172a 100%); border: 1px solid #94a3b8; color: #fff; }
+  .btn.devito { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #fff; }
+  .btn.support { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #fff; }
+  .btn.clicker { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; }
+  .btn.gov-menu { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; }
+  .btn.apps-menu { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #fff; }
+  .btn.gray { background: rgba(255,255,255,0.14); }
   .btn.small { padding: 8px 12px; font-size: 13px; width: auto; margin: 0; }
+  .btn.tiny { padding: 5px 9px; font-size: 11px; width: auto; margin: 0; background: rgba(255,255,255,0.15); }
   input, select {
-    width: 100%;
-    padding: 12px; margin: 6px 0;
-    font-size: 15px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    outline: none;
+    width: 100%; padding: 11px; margin: 5px 0; font-size: 14px;
+    border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08); color: #fff; outline: none;
   }
+  input[type="file"] { padding: 8px; font-size: 13px; }
   input:focus, select:focus { border-color: #4f7cff; }
   select option { background: #16213e; color: #fff; }
   .row { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
   .row input, .row select { flex: 1; margin: 0; }
-  .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
+  .msg { font-size: 13px; margin: 6px 0; min-height: 16px; transition: opacity 0.3s; }
   .err { color: #ff7b7b; }
   .ok { color: #6ee7a0; }
-  .acct, .noti-item {
+  .acct, .noti-item, .tx-item {
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 12px;
-    padding: 12px; margin: 10px 0;
+    padding: 12px; margin: 8px 0;
   }
-  .acct .name { font-weight: 700; font-size: 16px; }
+  .bank-card-ui {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 209, 102, 0.45);
+    border-radius: 14px;
+    padding: 16px; margin: 10px 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  }
+  .city-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(79, 124, 255, 0.16) 100%);
+    border: 1px solid rgba(255, 209, 102, 0.45);
+    border-radius: 12px;
+    padding: 14px; margin: 10px 0 16px;
+  }
+  .acct .name { font-weight: 700; font-size: 15px; }
   .acct .bal { color: #ffd166; margin: 4px 0; }
   .pw, .salary-info { color: #9fb0c9; font-size: 13px; }
-  .balance-big {
-    font-size: 34px; font-weight: 800; color: #ffd166;
-    text-align: center; margin: 14px 0;
+  .balance-big { font-size: 32px; font-weight: 800; color: #ffd166; text-align: center; margin: 10px 0; }
+  .back { background: none; border: none; color: #9fb0c9; cursor: pointer; font-size: 14px; padding: 6px 0; margin-bottom: 8px; }
+  .del { background: none; border: none; color: #ff7b7b; cursor: pointer; font-size: 18px; font-weight: bold; }
+  .hidden { display: none !important; }
+  .badge-blocked, .badge-exile, .badge-gov, .badge-job, .badge-elder, .badge-sale {
+    display: inline-block; padding: 2px 6px; font-size: 11px; border-radius: 6px; font-weight: bold;
   }
-  .back {
-    background: none; border: none; color: #9fb0c9;
-    cursor: pointer; font-size: 14px; padding: 6px 0; margin-bottom: 8px;
+  .badge-blocked { background: #d94e4e; color: #fff; }
+  .badge-exile { background: #7f1d1d; border: 1px solid #f87171; color: #fff; }
+  .badge-gov { background: #f59e0b; color: #1a1a2e; }
+  .badge-job { background: #4f7cff; color: #fff; }
+  .badge-elder { background: #6366f1; color: #fff; }
+  .badge-sale { background: #2fae66; color: #fff; }
+  .widget-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    margin: 3px 4px 3px 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
   }
-  .hidden { display: none; }
-  .badge-blocked {
-    display: inline-block; padding: 2px 6px; font-size: 11px;
-    background: #d94e4e; color: #fff; border-radius: 6px; font-weight: bold;
+  .widget-bee-ok { background: rgba(245, 158, 11, 0.22); border-color: #fbbf24; color: #fde68a; }
+  .widget-bee-no { background: rgba(217, 78, 78, 0.22); border-color: #f87171; color: #fecaca; }
+  .widget-work { background: rgba(79, 124, 255, 0.22); border-color: #60a5fa; color: #dbeafe; }
+  .bee-ban-icon {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; font-size: 14px;
   }
+  .bee-ban-icon::after {
+    content: ""; position: absolute; width: 18px; height: 18px;
+    border: 2.5px solid #ef4444; border-radius: 50%;
+    background: linear-gradient(to top right, transparent 44%, #ef4444 45%, #ef4444 55%, transparent 56%);
+    pointer-events: none;
+  }
+  .hp-bar-wrap { width: 100%; height: 12px; background: rgba(255,255,255,0.12); border-radius: 8px; overflow: hidden; margin: 6px 0; }
+  .hp-bar-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #22c55e); transition: width 0.3s; }
+  .job-anim-stage {
+    background: rgba(0,0,0,0.32); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 14px; margin: 10px 0; text-align: center; overflow: hidden;
+  }
+  .anim-icon { font-size: 40px; display: inline-block; }
+  @keyframes sirenFlash { 0%,100% { filter: drop-shadow(0 0 10px #3b82f6); transform: scale(1); } 50% { filter: drop-shadow(0 0 14px #ef4444); transform: scale(1.12); } }
+  @keyframes gavelHit { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(-32deg); } }
+  @keyframes pulseBeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+  @keyframes sweepBroom { 0%,100% { transform: translateX(-22px) rotate(-18deg); } 50% { transform: translateX(22px) rotate(18deg); } }
+  @keyframes ballBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px) rotate(180deg); } }
+  @keyframes spinCoin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+  @keyframes spinLeft { 0% { transform: rotateY(0deg) scale(1.05); } 100% { transform: rotateY(-360deg) scale(1.05); } }
+  @keyframes spinRight { 0% { transform: rotateY(0deg) scale(1.05); } 100% { transform: rotateY(360deg) scale(1.05); } }
+  .anim-siren { animation: sirenFlash 1s infinite; }
+  .anim-gavel { animation: gavelHit 1.1s infinite; }
+  .anim-pulse { animation: pulseBeat 1.2s infinite; }
+  .anim-sweep { animation: sweepBroom 1.1s infinite ease-in-out; }
+  .anim-ball { animation: ballBounce 0.9s infinite ease-in-out; }
+  .anim-coin { animation: spinCoin 2s infinite linear; }
+  .pole-stage {
+    position: relative; height: 150px; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle, rgba(217,70,239,0.28) 0%, rgba(15,23,42,0.85) 75%);
+    border-radius: 14px; border: 1px solid rgba(240,171,252,0.4); margin: 10px 0;
+  }
+  .pole-rod { position: absolute; width: 6px; height: 135px; background: linear-gradient(90deg, #94a3b8, #f8fafc, #64748b); border-radius: 4px; }
+  .dancer-avatar { position: relative; z-index: 2; font-size: 54px; transition: transform 0.3s; }
+  .dancer-left { animation: spinLeft 1.4s infinite linear; }
+  .dancer-right { animation: spinRight 1.4s infinite linear; }
+  .wheel-wrap { position: relative; width: 210px; height: 210px; margin: 16px auto; }
+  .wheel-pointer {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
+    border-top: 20px solid #ffd166; z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+  }
+  .casino-wheel {
+    width: 100%; height: 100%; border-radius: 50%; border: 5px solid #ffd166;
+    background: conic-gradient(#22c55e 0deg 36deg, #1e293b 36deg 72deg, #334155 72deg 108deg, #1e293b 108deg 144deg, #334155 144deg 180deg, #1e293b 180deg 216deg, #334155 216deg 252deg, #1e293b 252deg 288deg, #334155 288deg 324deg, #1e293b 324deg 360deg);
+    box-shadow: 0 0 24px rgba(250, 204, 21, 0.35);
+    transition: transform 3.2s cubic-bezier(0.15, 0.85, 0.25, 1);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff;
+  }
+  .old-price { text-decoration: line-through; color: #9fb0c9; font-size: 13px; margin-right: 6px; }
+  .tx-plus { color: #6ee7a0; font-weight: 600; font-size: 14px; }
+  .tx-minus { color: #ff7b7b; font-weight: 600; font-size: 14px; }
+  .tx-date { color: #9fb0c9; font-size: 11px; margin-top: 4px; }
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 14, 28, 0.88); backdrop-filter: blur(6px);
+    display: flex; justify-content: center; align-items: center; z-index: 999; padding: 16px;
+  }
+  .modal-box {
+    width: 100%; max-width: 360px; background: linear-gradient(160deg, #1e2542 0%, #151b30 100%);
+    border: 1px solid rgba(79, 124, 255, 0.4); box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    border-radius: 16px; padding: 20px;
+  }
+  .death-box {
+    width: 100%; max-width: 370px; background: linear-gradient(160deg, #450a0a 0%, #1a0505 100%);
+    border: 2px solid #ef4444; box-shadow: 0 12px 36px rgba(239,68,68,0.45);
+    border-radius: 18px; padding: 24px; text-align: center;
+  }
+  .modal-header { font-size: 16px; font-weight: 700; color: #ffd166; margin-bottom: 10px; }
+  .modal-body {
+    background: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px;
+    font-size: 15px; line-height: 1.45; color: #eef1f6; word-wrap: break-word; margin-bottom: 14px;
+  }
+  .progress-wrap { width: 100%; height: 14px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #ffd166); width: 0%; transition: width 0.3s; }
+  .coin-btn {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffe082, #f59e0b 65%, #b45309 100%);
+    border: 6px solid #fcd34d; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.45);
+    color: #451a03; font-size: 26px; font-weight: 900; cursor: pointer; margin: 18px auto;
+    display: flex; align-items: center; justify-content: center; user-select: none;
+  }
+  .item-photo { width: 100%; max-height: 190px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.15); }
+  .chat-box {
+    background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+    padding: 10px; height: 230px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;
+  }
+  .chat-msg { max-width: 82%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.35; word-wrap: break-word; }
+  .chat-msg.me { align-self: flex-end; background: #4f7cff; color: #fff; border-bottom-right-radius: 3px; }
+  .chat-msg.other { align-self: flex-start; background: rgba(255,255,255,0.12); color: #eef1f6; border-bottom-left-radius: 3px; }
+  .chat-meta { font-size: 10px; opacity: 0.75; margin-top: 3px; text-align: right; }
 </style>
-
 <script type="module">
   import { initializeApp } from "https://gstatic.com";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://gstatic.com";
-
   const firebaseConfig = {
     apiKey: "AIzaSyDgae6MDMQ1FM4Anlg7R7qPGX3Kc_S-DagPQ",
     authDomain: "://firebaseapp.com",
@@ -96,35 +230,50 @@
     messagingSenderId: "587303464356",
     appId: "1:587303464356:web:72adddaef46fde263ca531"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const STORE_KEY = 'goldcoin_accounts_v2';
-
   onSnapshot(doc(db, "database", "global_state"), (docSnap) => {
     if (docSnap.exists()) {
-      const cloudData = docSnap.data().accounts || [];
-      const cloudNotis = docSnap.data().notifications || [];
-      localStorage.setItem(STORE_KEY, JSON.stringify(cloudData));
-      localStorage.setItem(STORE_KEY + '_notis', JSON.stringify(cloudNotis));
-      
-      if (typeof window.updateCurrentScreen === 'function') window.updateCurrentScreen();
-      if (typeof window.renderAdmin === 'function' && !document.getElementById('screen-admin').classList.contains('hidden')) window.renderAdmin();
-      if (typeof window.renderPresident === 'function' && !document.getElementById('screen-president').classList.contains('hidden')) window.renderPresident();
+      const data = docSnap.data();
+      localStorage.setItem(STORE_KEY, JSON.stringify(data.accounts || []));
+      localStorage.setItem(STORE_KEY + '_cards', JSON.stringify(data.cards || []));
+      localStorage.setItem(STORE_KEY + '_notis', JSON.stringify(data.notifications || []));
+      localStorage.setItem(STORE_KEY + '_invoices', JSON.stringify(data.invoices || []));
+      localStorage.setItem(STORE_KEY + '_gavisha', JSON.stringify(data.gavishaPosts || []));
+      localStorage.setItem(STORE_KEY + '_bns', JSON.stringify(data.bnsItems || []));
+      localStorage.setItem(STORE_KEY + '_police_reports', JSON.stringify(data.policeReports || []));
+      localStorage.setItem(STORE_KEY + '_club_state', JSON.stringify(data.clubState || { activeDancer: null, spinDir: 'idle' }));
+      localStorage.setItem(STORE_KEY + '_city_upgrade', String(data.cityUpgradeLevel || 0));
+      localStorage.setItem(STORE_KEY + '_devito_items', JSON.stringify(data.devitoItems || []));
+      localStorage.setItem(STORE_KEY + '_devito_orders', JSON.stringify(data.devitoOrders || []));
+      localStorage.setItem(STORE_KEY + '_support_tickets', JSON.stringify(data.supportTickets || []));
+      if (data.appTitle) localStorage.setItem(STORE_KEY + '_app_title', data.appTitle);
+      if (typeof window.applyAppTitle === 'function') window.applyAppTitle();
+      if (typeof window.ensureGovCards === 'function') window.ensureGovCards(false);
+      if (typeof window.syncAllSalaries === 'function') window.syncAllSalaries(false);
+      if (typeof window.refreshActiveScreens === 'function') window.refreshActiveScreens();
     }
   });
-
   async function syncToCloud() {
     try {
-      const localData = JSON.parse(localStorage.getItem(STORE_KEY)) || [];
-      const localNotis = JSON.parse(localStorage.getItem(STORE_KEY + '_notis')) || [];
-      await setDoc(doc(db, "database", "global_state"), { accounts: localData, notifications: localNotis });
-      console.log("Данные успешно синхронизированы с облаком Firebase!");
-    } catch (e) {
-      console.error("Ошибка отправки данных:", e);
-    }
+      await setDoc(doc(db, "database", "global_state"), {
+        accounts: JSON.parse(localStorage.getItem(STORE_KEY)) || [],
+        cards: JSON.parse(localStorage.getItem(STORE_KEY + '_cards')) || [],
+        notifications: JSON.parse(localStorage.getItem(STORE_KEY + '_notis')) || [],
+        invoices: JSON.parse(localStorage.getItem(STORE_KEY + '_invoices')) || [],
+        gavishaPosts: JSON.parse(localStorage.getItem(STORE_KEY + '_gavisha')) || [],
+        bnsItems: JSON.parse(localStorage.getItem(STORE_KEY + '_bns')) || [],
+        policeReports: JSON.parse(localStorage.getItem(STORE_KEY + '_police_reports')) || [],
+        clubState: JSON.parse(localStorage.getItem(STORE_KEY + '_club_state')) || { activeDancer: null, spinDir: 'idle' },
+        cityUpgradeLevel: parseInt(localStorage.getItem(STORE_KEY + '_city_upgrade') || '0'),
+        devitoItems: JSON.parse(localStorage.getItem(STORE_KEY + '_devito_items')) || [],
+        devitoOrders: JSON.parse(localStorage.getItem(STORE_KEY + '_devito_orders')) || [],
+        supportTickets: JSON.parse(localStorage.getItem(STORE_KEY + '_support_tickets')) || [],
+        appTitle: localStorage.getItem(STORE_KEY + '_app_title') || 'Город'
+      });
+    } catch (e) { console.error("Ошибка синхронизации:", e); }
   }
-
   window.syncToCloud = syncToCloud;
 </script>
 </head>
@@ -133,13 +282,58 @@
 
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <div id="screen-home">
-    <h1>💰 Счета GoldCoin</h1>
-    <p class="sub">Система Зарплат и Премий</p>
-    <button class="btn" onclick="showScreen('admin-login')">🔐 Admin</button>
-    <button class="btn red" onclick="showScreen('pres-login')">👑 Президент</button>
-    <button class="btn green" onclick="showScreen('my-login')">👤 Мой счёт</button>
+    <h1 id="main-app-title">🏙 Город</h1>
+    <p class="sub">Единая городская система</p>
+    <button class="btn green" onclick="showScreen('acc-login')">👤 Мой аккаунт</button>
+    <button class="btn gov-menu" onclick="showScreen('menu-gov')">🏛 Госработы и организации</button>
+    <button class="btn apps-menu" onclick="showScreen('menu-apps')">📱 Приложения</button>
+    <button class="btn gray" onclick="showScreen('admin-login')" style="margin-top:18px;">🔐 Admin</button>
   </div>
 
+  <!-- МЕНЮ: ГОСРАБОТЫ И ОРГАНИЗАЦИИ -->
+  <div id="screen-menu-gov" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Назад в меню</button>
+    <h2>🏛 Госработы и организации</h2>
+    <p class="sub">Выберите ведомство или предприятие</p>
+    <button class="btn red" onclick="showScreen('pres-login')">👑 Президент</button>
+    <button class="btn police" onclick="openJobGate('police')">🚓 Полиция</button>
+    <button class="btn bank" onclick="openJobGate('bank')">🏦 Банк</button>
+    <button class="btn church" onclick="openJobGate('church')">⛪ Церковь</button>
+    <button class="btn court" onclick="openJobGate('court')">⚖️ Суд</button>
+    <button class="btn elder" onclick="openJobGate('elder')">🏛 Суд Старейшин</button>
+    <button class="btn hospital" onclick="openJobGate('hospital')">🏥 Больница</button>
+    <button class="btn edu" onclick="openJobGate('school')">🏫 Школа</button>
+    <button class="btn edu" onclick="openJobGate('univ')">🎓 Университет</button>
+    <button class="btn edu" onclick="openJobGate('college')">📚 Колледж</button>
+    <button class="btn army" onclick="openJobGate('army')">🪖 Армия</button>
+    <button class="btn war" onclick="openJobGate('war')">⚔️ Война</button>
+    <button class="btn football" onclick="openJobGate('football')">⚽ Футбольный клуб</button>
+    <button class="btn casino" onclick="openJobGate('casino')">🎰 Казино (Работа)</button>
+    <button class="btn holiday" onclick="openJobGate('holiday')">🎉 Праздники</button>
+    <button class="btn mint" onclick="openJobGate('mint')">🪙 Чинка лимитированных монет</button>
+    <button class="btn ogurchik" onclick="openJobGate('ogurchik')">🥒 Стрип-клуб «Огурчик» (Работа)</button>
+    <button class="btn gray" onclick="openJobGate('janitor')">🧹 Дворник</button>
+    <button class="btn gavisha" onclick="openJobGate('gavisha')">📰 Гавиша (Редакция)</button>
+    <button class="btn bns" onclick="openJobGate('bns')">🔌 БНС (Сотрудники)</button>
+    <button class="btn darkops" onclick="openJobGate('killer')">🎯 Киллеры</button>
+    <button class="btn darkops" onclick="openJobGate('tck')">🪪 ТЦК</button>
+    <button class="btn darkops" onclick="openJobGate('collector')">💼 Коллекторы</button>
+  </div>
+
+  <!-- МЕНЮ: ПРИЛОЖЕНИЯ -->
+  <div id="screen-menu-apps" class="hidden">
+    <button class="back" onclick="showScreen('home')">← Назад в меню</button>
+    <h2>📱 Приложения</h2>
+    <p class="sub">Банк, казино, услуги, клуб, афиша и маркетплейс</p>
+    <button class="btn bank" onclick="openMyBank()">🏦 Мой банк</button>
+    <button class="btn casino" onclick="openCasinoWheel()">🎰 Казино (Колесо Фортуны)</button>
+    <button class="btn" onclick="openCityServices()">📋 Городские услуги (Драка, Заявления, Контракт)</button>
+    <button class="btn ogurchik" onclick="openOgurchikViewer()">🥒 Стрип-клуб «Огурчик» (Зрительный зал)</button>
+    <button class="btn bns" onclick="showScreen('bns-store')">🔌 БНС (Магазин техники)</button>
+    <button class="btn gavisha" onclick="showScreen('gavisha-public')">📰 Гавиша (Городская афиша)</button>
+    <button class="btn clicker" onclick="showScreen('clicker-login')">🪙 Кликер</button>
+    <button class="btn devito" onclick="showScreen('devito-role')">🛒 Девито</button>
+  </div>
   <!-- ВХОД АДМИНА -->
   <div id="screen-admin-login" class="hidden">
     <button class="back" onclick="showScreen('home')">← Назад</button>
@@ -153,450 +347,1798 @@
   <div id="screen-admin" class="hidden">
     <button class="back" onclick="showScreen('home')">← Выйти</button>
     <h2>Панель админа</h2>
-    <h3 style="margin:14px 0 6px;font-size:14px;">Создать счёт</h3>
-    <input id="new-nick" placeholder="Ник">
-    <input id="new-pass" placeholder="Пароль">
-    <button class="btn green" onclick="createAccount()">Создать счёт</button>
-    <div class="msg" id="create-msg"></div>
-    <h3 style="margin:14px 0 6px;font-size:14px;">Все счета</h3>
+
+    <h3>🏙 Название города / системы</h3>
+    <div class="acct">
+      <div class="row">
+        <input id="admin-app-title-input" placeholder="Новое название">
+        <button class="btn small" onclick="changeAppTitle()">Сохранить</button>
+      </div>
+      <div class="msg" id="title-msg" style="margin-bottom:0;"></div>
+    </div>
+
+    <h3>🐝 Виджеты пчёлок (только Admin)</h3>
+    <div class="acct">
+      <input id="admin-bee-nick" placeholder="Ник гражданина">
+      <div class="row" style="margin-top:6px;">
+        <button class="btn small green" onclick="setBeeWidget('respect')">🐝 Уважает</button>
+        <button class="btn small red" onclick="setBeeWidget('disrespect')">🚫 Не уважает</button>
+        <button class="btn small gray" onclick="setBeeWidget('')">Убрать</button>
+      </div>
+      <div class="msg" id="bee-admin-msg" style="margin-bottom:0;"></div>
+    </div>
+
+    <h3>🏛 Совет Старейшин (только Admin)</h3>
+    <div class="acct">
+      <div class="row">
+        <input id="admin-elder-nick" placeholder="Ник гражданина в Совет">
+        <button class="btn small elder" onclick="toggleElderCouncil(true)">Добавить</button>
+      </div>
+      <div class="msg" id="elder-admin-msg" style="margin-bottom:0;"></div>
+    </div>
+    
+    <h3>👤 Создать аккаунт гражданина</h3>
+    <div class="acct">
+      <input id="new-nick" placeholder="Ник гражданина">
+      <input id="new-pass" placeholder="Пароль от аккаунта">
+      <input id="new-age" type="number" min="0" placeholder="Возраст (от 0 и выше, по умолчанию 18)">
+      <button class="btn green" onclick="createAccount()">Создать аккаунт</button>
+      <div class="msg" id="create-msg" style="margin-bottom:0;"></div>
+    </div>
+
+    <h3>💳 Выпустить банковскую карту</h3>
+    <div class="acct">
+      <input id="new-card-num" placeholder="Номер / название карты (напр. 4400-1122)">
+      <input id="new-card-pin" placeholder="PIN / пароль карты">
+      <button class="btn bank" onclick="createCardAdmin()">Создать карту</button>
+      <div class="msg" id="create-card-msg" style="margin-bottom:0;"></div>
+    </div>
+
+    <h3>💸 Перевод между любыми картами</h3>
+    <div class="acct">
+      <input id="adm-tr-from" placeholder="С какой карты / счёта">
+      <input id="adm-tr-to" placeholder="На какую карту / счёт">
+      <input id="adm-tr-amount" type="number" min="0.01" step="0.01" placeholder="Сумма в GC">
+      <input id="adm-tr-comment" placeholder="Сообщение к переводу (необязательно)">
+      <button class="btn small" style="width:100%; margin-top:6px;" onclick="adminTransfer()">Выполнить перевод</button>
+      <div class="msg" id="adm-tr-msg" style="margin-bottom:0;"></div>
+    </div>
+
+    <h3>💳 Все банковские карты и гос. счета</h3>
+    <div id="admin-cards-list"></div>
+
+    <h3>👥 Все аккаунты граждан (Возраст и статус)</h3>
     <div id="admin-list"></div>
   </div>
-
-  <!-- ВХОД ПРЕЗИДЕНТА -->
-  <div id="screen-pres-login" class="hidden">
+  <!-- ВХОД В МОЙ АККАУНТ -->
+  <div id="screen-acc-login" class="hidden">
     <button class="back" onclick="showScreen('home')">← Назад</button>
-    <h2>Вход для Президента</h2>
+    <h2>👤 Вход в Мой аккаунт</h2>
+    <input id="acc-nick" placeholder="Ваш ник">
+    <input type="password" id="acc-pass" placeholder="Пароль аккаунта">
+    <button class="btn green" onclick="accLogin()">Войти в аккаунт</button>
+    <div class="msg err" id="acc-msg"></div>
+  </div>
+
+  <!-- МОЙ АККАУНТ -->
+  <div id="screen-account" class="hidden">
+    <button class="back" onclick="accLogout()">← Выйти из аккаунта</button>
+    <h2 id="acc-title">👤 Аккаунт</h2>
+    <div id="acc-age-hp" class="pw" style="margin-bottom:4px;"></div>
+    <div class="hp-bar-wrap"><div id="acc-hp-bar" class="hp-bar-fill"></div></div>
+    <div id="acc-widgets" style="margin:6px 0 8px;"></div>
+    <p class="sub" id="acc-salary-desc" style="margin-bottom:4px;">Зарплата не настроена</p>
+    <div class="msg" id="bonus-msg"></div>
+
+    <!-- КНОПКА СНА (С 20:00 ДО 07:00, +10 HP ЗА ЧАС) -->
+    <div id="acc-sleep-box" class="acct" style="margin:8px 0;"></div>
+
+    <!-- 10 ПОСЛЕДОВАТЕЛЬНЫХ УЛУЧШЕНИЙ АККАУНТА -->
+    <div id="acc-upgrades-box" class="city-box" style="margin:8px 0;"></div>
+
+    <!-- УВЕДОМЛЕНИЯ АККАУНТА -->
+    <div id="acc-notis-box" class="acct hidden" style="margin:8px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="name">🔔 Уведомления аккаунта</span>
+        <button class="btn tiny gray" onclick="clearAccountNotis()">Очистить</button>
+      </div>
+      <div id="acc-notis-list" style="max-height:190px; overflow-y:auto;"></div>
+    </div>
+
+    <div id="acc-job-box" class="hidden" style="margin:10px 0;"></div>
+
+    <button class="btn orange" onclick="requestBonus()">🎯 Потребовать премию у Президента</button>
+    <button class="btn bank" onclick="openMyBank()">🏦 Открыть Мой банк (Карты)</button>
+
+    <h3>💳 Мои привязанные карты</h3>
+    <div id="acc-cards-list"></div>
+
+    <h3>➕ Привязать карту к аккаунту</h3>
+    <div class="acct">
+      <input id="link-card-num" placeholder="Номер / название карты">
+      <input type="password" id="link-card-pin" placeholder="PIN / пароль карты">
+      <button class="btn small green" style="width:100%; margin-top:6px;" onclick="linkCardToAccount()">Добавить карту на аккаунт</button>
+      <div class="msg" id="link-card-msg" style="margin-bottom:0;"></div>
+    </div>
+  </div>
+  <!-- МОЙ БАНК (УПРАВЛЕНИЕ КАРТАМИ АККАУНТА) -->
+  <div id="screen-my-bank" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>🏦 Мой банк</h2>
+    <div id="bank-no-acc-box" class="acct hidden">
+      <p class="sub" style="margin:6px 0;">Сначала войдите в «👤 Мой аккаунт» на главном экране, чтобы управлять привязанными картами.</p>
+      <button class="btn green" onclick="showScreen('acc-login')">Войти в аккаунт</button>
+    </div>
+    <div id="bank-main-box" class="hidden">
+      <label class="pw">Выберите активную карту аккаунта:</label>
+      <select id="active-card-select" onchange="onSelectActiveCard()"></select>
+      <div id="active-card-display" class="bank-card-ui"></div>
+      <button class="btn gray" onclick="openTransactions()" style="margin-bottom:12px;">📜 История транзакций карты</button>
+
+      <div id="my-invoices-section" class="hidden">
+        <h3>🧾 Входящие счета на оплату</h3>
+        <div id="my-invoices-list"></div>
+      </div>
+
+      <h3>💸 Перевод на другую карту / счёт</h3>
+      <div class="acct">
+        <input id="tr-card-to" placeholder="Номер карты или гос. счёт получателя">
+        <input id="tr-amount" type="number" min="0.01" step="0.01" placeholder="Сумма в GC">
+        <input id="tr-comment" placeholder="Сообщение получателю (необязательно)">
+        <button class="btn bank" style="margin-bottom:0;" onclick="doTransfer()">Перевести с карты</button>
+        <div class="msg" id="tr-msg" style="margin-bottom:0;"></div>
+      </div>
+
+      <h3>🧾 Выставить счёт на карту</h3>
+      <div class="acct">
+        <input id="inv-to-card" placeholder="Номер карты получателя">
+        <input id="inv-amount" type="number" min="0.01" step="0.01" placeholder="Сумма к оплате (GC)">
+        <input id="inv-reason" placeholder="За что счёт (причина)">
+        <button class="btn small orange" style="width:100%; margin-top:6px;" onclick="createInvoice()">Выставить счёт</button>
+        <div class="msg" id="inv-msg" style="margin-bottom:0;"></div>
+      </div>
+    </div>
+  </div>
+  <!-- КАЗИНО: КОЛЕСО ФОРТУНЫ (9 СЕКТОРОВ 0 И 1 СЕКТОР x2) -->
+  <div id="screen-casino-wheel" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>🎰 Казино — Колесо Фортуны</h2>
+    <p class="sub">10 участков: 9 участков «0» и 1 выигрышный участок «x2» (18+)</p>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer"></div>
+      <div id="casino-wheel-disc" class="casino-wheel">x2 / 0</div>
+    </div>
+    <div id="casino-wheel-bal" class="pw" style="text-align:center; margin-bottom:8px;"></div>
+    <div class="acct">
+      <input id="casino-bet-amount" type="number" min="1" step="0.01" placeholder="Сумма ставки (GC)">
+      <button id="casino-spin-btn" class="btn casino" style="margin-bottom:0;" onclick="spinCasinoWheel()">🎡 Поставить и крутить колесо</button>
+      <div id="casino-wheel-msg" class="msg" style="margin-bottom:0;"></div>
+    </div>
+  </div>
+
+  <!-- ГОРОДСКИЕ УСЛУГИ -->
+  <div id="screen-city-services" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>📋 Городские услуги и действия</h2>
+    <div id="services-age-info" class="pw" style="margin-bottom:8px;"></div>
+    <div id="services-msg" class="msg"></div>
+
+    <h3>🥊 Подраться с гражданином (-25 HP)</h3>
+    <div class="acct">
+      <input id="fight-target-nick" placeholder="Ник соперника">
+      <button class="btn small red" style="width:100%; margin-top:4px;" onclick="startStreetFight()">Подраться (-25 HP обоим)</button>
+    </div>
+
+    <h3>🚓 Написать заявление в Полицию</h3>
+    <div class="acct">
+      <input id="rep-suspect-nick" placeholder="Ник нарушителя">
+      <input id="rep-reason" placeholder="Суть заявления / что случилось">
+      <button class="btn small police" style="width:100%; margin-top:4px;" onclick="sendPoliceReport()">Отправить заявление в Полицию</button>
+    </div>
+
+    <div id="services-adaptive-list"></div>
+  </div>
+
+  <!-- СТРИП-КЛУБ «ОГУРЧИК» (ЗРИТЕЛЬНЫЙ ЗАЛ) -->
+  <div id="screen-ogurchik-viewer" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>🥒 Стрип-клуб «Огурчик»</h2>
+    <p class="sub">Сцена и выступление танцовщиц в прямом эфире</p>
+    <div id="ogurchik-viewer-stage"></div>
+  </div>
+
+  <!-- ГАВИША (ПУБЛИЧНАЯ АФИША ГОРОДА) -->
+  <div id="screen-gavisha-public" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>📰 Гавиша — Афиша города</h2>
+    <p class="sub">Актуальные события, объявления и мероприятия</p>
+    <div id="gavisha-public-list"></div>
+  </div>
+
+  <!-- УНИВЕРСАЛЬНЫЙ ВХОД НА РАБОТУ -->
+  <div id="screen-job-login" class="hidden">
+    <button class="back" onclick="showScreen('menu-gov')">← Назад в Госработы</button>
+    <h2 id="job-login-title">Вход на работу</h2>
+    <p class="sub" style="margin-bottom:10px;">Войдите по вашему аккаунту (снимает -5 HP за выход на смену)</p>
+    <input id="job-login-nick" placeholder="Ваш ник аккаунта">
+    <input type="password" id="job-login-pass" placeholder="Пароль аккаунта">
+    <button class="btn" onclick="submitJobLogin()">Заступить на смену</button>
+    <div class="msg err" id="job-login-msg"></div>
+  </div>
+  <!-- ПРЕЗИДЕНТ -->
+  <div id="screen-pres-login" class="hidden">
+    <button class="back" onclick="showScreen('menu-gov')">← Назад</button>
+    <h2>👑 Вход для Президента</h2>
     <input type="password" id="pres-pass" placeholder="Код Президента">
     <button class="btn red" onclick="presLogin()">Управлять государством</button>
     <div class="msg err" id="pres-msg"></div>
   </div>
-
-  <!-- ПАНЕЛЬ ПРЕЗИДЕНТА -->
   <div id="screen-president" class="hidden">
     <button class="back" onclick="showScreen('home')">← Выйти</button>
     <h2>👑 Панель Президента</h2>
-    
-    <h3 style="margin:14px 0 6px;font-size:14px;">🔔 Уведомления о премиях</h3>
-    <div id="pres-notifications" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
-
-    <h3 style="margin:14px 0 6px;font-size:14px;">Поиск, блокировка и зарплаты</h3>
-    <input id="pres-search" placeholder="Введите ник для поиска..." oninput="renderPresident()">
+    <div id="pres-city-box" class="city-box"></div>
+    <div id="pres-upgrades-box" class="city-box"></div>
+    <h3>🔔 Запросы на премии</h3>
+    <div id="pres-notifications" style="max-height:180px; overflow-y:auto; margin-bottom:10px;"></div>
+    <h3>Граждане, работы, армия/война, изгнание и зарплаты</h3>
+    <input id="pres-search" placeholder="Поиск гражданина по нику..." oninput="renderPresident()">
     <div id="pres-list"></div>
   </div>
 
-  <!-- ВХОД ПОЛЬЗОВАТЕЛЯ -->
-  <div id="screen-my-login" class="hidden">
-    <button class="back" onclick="showScreen('home')">← Назад</button>
-    <h2>Мой счёт</h2>
-    <input id="my-nick" placeholder="Ник">
-    <input type="password" id="my-pass" placeholder="Пароль">
-    <button class="btn green" onclick="myLogin()">Войти</button>
-    <div class="msg err" id="my-msg"></div>
+  <!-- ПОЛИЦИЯ -->
+  <div id="screen-police" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🚓 Отдел Полиции</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-siren">🚓🚨</div><div class="pw" style="margin-top:4px;">Патруль и приём заявлений граждан</div></div>
+    <div id="police-director-box" class="hidden"></div>
+    <h3>📨 Входящие заявления от граждан</h3>
+    <div id="police-reports-list"></div>
+    <h3>Выписка штрафа на карту гражданина</h3>
+    <input id="police-search" placeholder="Поиск карты или владельца..." oninput="renderPolice()">
+    <div class="msg" id="police-action-msg"></div>
+    <div id="police-list"></div>
   </div>
 
-  <!-- МОЙ СЧЁТ -->
-  <div id="screen-my" class="hidden">
-    <button class="back" onclick="myLogout()">← Выйти</button>
-    <h2 id="my-title">Счёт</h2>
-    <div class="balance-big" id="my-balance">0 GC</div>
-    <p class="sub" id="my-salary-desc" style="margin-bottom:2px;">Заработок не настроен</p>
-    <div class="msg" id="bonus-msg"></div>
-    
-    <button class="btn orange" onclick="requestBonus()" style="margin-bottom: 20px;">🎯 Потребовать премию</button>
-
-    <h3 style="margin:14px 0 6px;font-size:14px;">Перевести</h3>
-    <input id="tr-nick" placeholder="Ник получателя">
-    <input id="tr-amount" type="number" min="0" step="0.01" placeholder="Сумма в goldcoin">
-    <button class="btn" onclick="doTransfer()">Перевести</button>
-    <div class="msg" id="tr-msg"></div>
+  <!-- БАНК -->
+  <div id="screen-bank" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🏦 Отделение Банка</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-coin">🪙</div><div class="pw" style="margin-top:4px;">Банковский клиринг и эмиссия карт</div></div>
+    <div id="bank-director-box" class="hidden"></div>
+    <h3>Выпуск новой банковской карты</h3>
+    <div class="acct">
+      <input id="bank-new-card-num" placeholder="Номер / название карты">
+      <input id="bank-new-card-pin" placeholder="PIN / пароль карты">
+      <button class="btn small bank" style="width:100%; margin-top:4px;" onclick="createCardBank()">Выпустить карту</button>
+      <div class="msg" id="bank-card-msg" style="margin-bottom:0;"></div>
+    </div>
+    <h3>Карты и транзакции</h3>
+    <input id="bank-search" placeholder="Поиск карты..." oninput="renderBank()">
+    <div class="msg" id="bank-action-msg"></div>
+    <div id="bank-list"></div>
   </div>
 
+  <!-- ЦЕРКОВЬ -->
+  <div id="screen-church" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>⛪ Церковь (Верховный Патриарх и клир)</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">⛪✝️</div><div class="pw" style="margin-top:4px;">Духовное служение и таинство крещения</div></div>
+    <div id="church-director-box" class="hidden"></div>
+    <div id="church-account-box" class="city-box"></div>
+    <h3>✝️ Крещение граждан</h3>
+    <input id="church-search" placeholder="Поиск гражданина..." oninput="renderChurch()">
+    <div id="church-action-msg" class="msg"></div>
+    <div id="church-list"></div>
+  </div>
+
+  <!-- СУД -->
+  <div id="screen-court" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>⚖️ Городской Суд</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-gavel">🔨⚖️</div><div class="pw" style="margin-top:4px;">Верховное правосудие города</div></div>
+    <div id="court-director-box" class="hidden"></div>
+    <h3>Вынесение приговора / судебного штрафа</h3>
+    <input id="court-search" placeholder="Поиск карты или владельца..." oninput="renderCourt()">
+    <div id="court-action-msg" class="msg"></div>
+    <div id="court-list"></div>
+  </div>
+  <!-- СУД СТАРЕЙШИН -->
+  <div id="screen-elder" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🏛 Суд Старейшин</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🏛📜</div><div class="pw" style="margin-top:4px;">Мудрость и вердикты Совета Старейшин</div></div>
+    <div id="elder-director-box" class="hidden"></div>
+    <h3>Вердикты Совета и Суда Старейшин</h3>
+    <input id="elder-search" placeholder="Поиск карты или владельца..." oninput="renderElder()">
+    <div id="elder-action-msg" class="msg"></div>
+    <div id="elder-list"></div>
+  </div>
+
+  <!-- БОЛЬНИЦА -->
+  <div id="screen-hospital" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🏥 Городская Больница</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🏥❤️</div><div class="pw" style="margin-top:4px;">Медицинская помощь и восстановление HP</div></div>
+    <div id="hospital-director-box" class="hidden"></div>
+    <div id="hospital-account-box" class="city-box"></div>
+    <h3>Лечение граждан (восстановление до 100 HP)</h3>
+    <input id="hospital-search" placeholder="Поиск пациента по нику..." oninput="renderHospital()">
+    <div id="hospital-action-msg" class="msg"></div>
+    <div id="hospital-list"></div>
+  </div>
+
+  <!-- ШКОЛА, УНИВЕРСИТЕТ, КОЛЛЕДЖ -->
+  <div id="screen-school" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🏫 Городская Школа</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🏫📖</div><div class="pw" style="margin-top:4px;">Среднее образование города</div></div>
+    <div id="school-director-box" class="hidden"></div>
+    <div id="school-account-box" class="city-box"></div>
+    <h3>Педагогический состав</h3>
+    <div id="school-staff-list"></div>
+  </div>
+  <div id="screen-univ" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🎓 Государственный Университет</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🎓🏛</div><div class="pw" style="margin-top:4px;">Высшее образование и наука</div></div>
+    <div id="univ-director-box" class="hidden"></div>
+    <div id="univ-account-box" class="city-box"></div>
+    <h3>Ректорат и преподаватели</h3>
+    <div id="univ-staff-list"></div>
+  </div>
+  <div id="screen-college" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>📚 Городской Колледж</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">📚🛠</div><div class="pw" style="margin-top:4px;">Профессиональная подготовка</div></div>
+    <div id="college-director-box" class="hidden"></div>
+    <div id="college-account-box" class="city-box"></div>
+    <h3>Преподаватели колледжа</h3>
+    <div id="college-staff-list"></div>
+  </div>
+
+  <!-- АРМИЯ И ВОЙНА -->
+  <div id="screen-army" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🪖 Армия</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🪖🎖</div><div class="pw" style="margin-top:4px;">Воинская часть и контроль призывников</div></div>
+    <div id="army-director-box" class="hidden"></div>
+    <div id="army-account-box" class="city-box"></div>
+    <h3>Военнослужащие и призывники</h3>
+    <div id="army-staff-list"></div>
+  </div>
+  <div id="screen-war" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>⚔️ Война (Штаб фронта)</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-siren">⚔️🔥</div><div class="pw" style="margin-top:4px;">Боевые действия и контрактники</div></div>
+    <div id="war-director-box" class="hidden"></div>
+    <div id="war-account-box" class="city-box"></div>
+    <h3>Личный состав и контрактники</h3>
+    <div id="war-staff-list"></div>
+  </div>
+  <!-- ФУТБОЛ, КАЗИНО, ПРАЗДНИКИ, ЧИНКА МОНЕТ -->
+  <div id="screen-football" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>⚽ Футбольный клуб</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-ball">⚽🥅</div><div class="pw" style="margin-top:4px;">Тренировка и трансферный рынок</div></div>
+    <div id="football-director-box" class="hidden"></div>
+    <h3>Состав и трансферные цены</h3>
+    <div id="football-action-msg" class="msg"></div>
+    <div id="football-list"></div>
+  </div>
+  <div id="screen-casino" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🎰 Городское Казино (Персонал)</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-coin">🎰🎲</div><div class="pw" style="margin-top:4px;">Игровой зал и касса казино</div></div>
+    <div id="casino-director-box" class="hidden"></div>
+    <div id="casino-account-box" class="city-box"></div>
+    <h3>Штат Казино</h3>
+    <div id="casino-staff-list"></div>
+  </div>
+  <div id="screen-holiday" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🎉 Служба Праздников</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🎉🎊</div><div class="pw" style="margin-top:4px;">Городские фестивали и торжества</div></div>
+    <div id="holiday-director-box" class="hidden"></div>
+    <div id="holiday-account-box" class="city-box"></div>
+    <h3>Организаторы праздников</h3>
+    <div id="holiday-staff-list"></div>
+  </div>
+  <div id="screen-mint" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🪙 Чинка лимитированных монет</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-coin">🪙✨</div><div class="pw" style="margin-top:4px;">Реставрация и полировка редких монет</div></div>
+    <div id="mint-director-box" class="hidden"></div>
+    <div id="mint-account-box" class="city-box"></div>
+    <h3>Мастера монетного двора</h3>
+    <div id="mint-staff-list"></div>
+  </div>
+
+  <!-- СТРИП-КЛУБ «ОГУРЧИК» (РАБОТА ТАНЦОВЩИЦЫ И РУКОВОДСТВА) -->
+  <div id="screen-ogurchik" class="hidden">
+    <button class="back" onclick="ogurchikLogout()">← Закончить смену и уйти со сцены</button>
+    <h2>🥒 Стрип-клуб «Огурчик»</h2>
+    <div id="ogurchik-director-box" class="hidden"></div>
+    <div id="ogurchik-dancer-controls" class="acct">
+      <div class="name" style="text-align:center; margin-bottom:6px;">💃 Управление танцем на шесте (видно зрителям!)</div>
+      <div class="pole-stage"><div class="pole-rod"></div><div id="ogurchik-work-dancer" class="dancer-avatar">💃</div></div>
+      <div class="row">
+        <button class="btn small ogurchik" onclick="setClubSpin('left')">⬅️ Крутиться влево</button>
+        <button class="btn small ogurchik" onclick="setClubSpin('right')">➡️ Крутиться вправо</button>
+      </div>
+      <button class="btn small gray" style="width:100%; margin-top:6px;" onclick="setClubSpin('idle')">⏸ Остановиться</button>
+    </div>
+    <div id="ogurchik-account-box" class="city-box"></div>
+    <h3>Коллектив клуба «Огурчик»</h3>
+    <div id="ogurchik-staff-list"></div>
+  </div>
+
+  <!-- ДВОРНИК (ОТДЕЛЬНАЯ РАБОТА) -->
+  <div id="screen-janitor" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🧹 Городской Дворник</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-sweep">🧹🍂</div><div class="pw" style="margin-top:4px;">Подметание улиц и уборка территории</div></div>
+    <div id="janitor-director-box" class="hidden"></div>
+    <div id="janitor-account-box" class="city-box"></div>
+    <h3>Бригада дворников</h3>
+    <div id="janitor-staff-list"></div>
+  </div>
+
+  <!-- ГАВИША И БНС -->
+  <div id="screen-gavisha" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>📰 Редакция «Гавиша»</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">📰✍️</div><div class="pw" style="margin-top:4px;">Публикация городской афиши</div></div>
+    <div id="gavisha-director-box" class="hidden"></div>
+    <div id="gavisha-account-box" class="city-box"></div>
+    <div class="acct">
+      <input id="gav-post-title" placeholder="Заголовок события">
+      <input id="gav-post-text" placeholder="Текст афиши / описание">
+      <button class="btn small gavisha" style="width:100%; margin-top:4px;" onclick="publishGavishaPost()">Опубликовать в Гавише</button>
+      <div id="gav-post-msg" class="msg" style="margin-bottom:0;"></div>
+    </div>
+    <h3>Опубликованные записи</h3>
+    <div id="gavisha-staff-posts"></div>
+  </div>
+  <div id="screen-bns" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🔌 БНС — Управление магазином</h2>
+    <div id="bns-director-box" class="hidden"></div>
+    <div id="bns-account-box" class="city-box"></div>
+    <div class="acct">
+      <input id="bns-item-title" placeholder="Название техники">
+      <div class="row"><input id="bns-item-price" type="number" step="0.01" placeholder="Цена (GC)"><input id="bns-item-qty" type="number" min="1" placeholder="Кол-во"></div>
+      <button class="btn small bns" style="width:100%; margin-top:4px;" onclick="publishBnsItem()">Добавить в БНС</button>
+      <div id="bns-pub-msg" class="msg" style="margin-bottom:0;"></div>
+    </div>
+    <h3>Витрина БНС</h3>
+    <div id="bns-staff-items"></div>
+  </div>
+  <div id="screen-bns-store" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>🔌 БНС — Магазин техники</h2>
+    <p class="sub">Оплата производится с активной карты вашего аккаунта</p>
+    <div id="bns-store-msg" class="msg"></div>
+    <div id="bns-store-list"></div>
+  </div>
+
+  <!-- КИЛЛЕРЫ, ТЦК, КОЛЛЕКТОРЫ -->
+  <div id="screen-killer" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🎯 Агентство «Киллеры»</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-siren">🎯🗡</div><div class="pw" style="margin-top:4px;">Выполнение контрактов (-75 HP цели)</div></div>
+    <div id="killer-director-box" class="hidden"></div>
+    <div id="killer-account-box" class="city-box"></div>
+    <input id="killer-search" placeholder="Поиск цели по нику..." oninput="renderKiller()">
+    <div id="killer-action-msg" class="msg"></div>
+    <div id="killer-list"></div>
+  </div>
+  <div id="screen-tck" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🪪 ТЦК (Военный комиссариат)</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-pulse">🪪📋</div><div class="pw" style="margin-top:4px;">Призыв в армию и розыск беглецов</div></div>
+    <div id="tck-director-box" class="hidden"></div>
+    <div id="tck-account-box" class="city-box"></div>
+    <div class="acct">
+      <input id="tck-target-nick" placeholder="Ник призывника">
+      <input id="tck-reason" placeholder="Текст повестки (необязательно)">
+      <button class="btn small darkops" style="width:100%; margin-top:4px;" onclick="sendTckDraft()">Отправить повестку в армию</button>
+      <div id="tck-draft-msg" class="msg" style="margin-bottom:0;"></div>
+    </div>
+    <h3>📋 Повестки и ввод 4-значного кода поимки</h3>
+    <div id="tck-drafts-list"></div>
+  </div>
+  <div id="screen-collector" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>💼 Коллекторское бюро</h2>
+    <div class="job-anim-stage"><div class="anim-icon anim-gavel">💼💸</div><div class="pw" style="margin-top:4px;">Принудительное взыскание долгов</div></div>
+    <div id="collector-director-box" class="hidden"></div>
+    <div id="collector-account-box" class="city-box"></div>
+    <input id="collector-search" placeholder="Поиск карты должника..." oninput="renderCollector()">
+    <div id="collector-action-msg" class="msg"></div>
+    <div id="collector-list"></div>
+  </div>
+  <!-- КЛИКЕР -->
+  <div id="screen-clicker-login" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>🪙 Доступ в Кликер</h2>
+    <p class="sub" style="margin-bottom:10px;">Переведите со своей карты на гос. счёт <b>кликкер</b> 10 000 000 GC</p>
+    <div id="clk-progress-box" class="acct" style="text-align:center;">
+      <div id="clk-progress-text" style="font-size:14px; font-weight:600; color:#ffd166;"></div>
+      <div class="progress-wrap"><div id="clk-progress-bar" class="progress-bar"></div></div>
+      <button class="btn clicker" style="margin-top:8px;" onclick="checkClickerAccess()">Проверить и войти</button>
+    </div>
+    <div class="msg err" id="clk-msg"></div>
+  </div>
+  <div id="screen-clicker-game" class="hidden">
+    <button class="back" onclick="exitClicker()">← Выйти в меню</button>
+    <h2 id="clk-game-title" style="text-align:center;">🪙 Кликер</h2>
+    <div class="balance-big" id="clk-game-bal">0 GC</div>
+    <p class="sub">Нажимайте на монету, чтобы зарабатывать +1 GC за клик!</p>
+    <button class="coin-btn" onclick="doCoinClick()">+1 GC</button>
+  </div>
+
+  <!-- ДЕВИТО И ПОДДЕРЖКА -->
+  <div id="screen-devito-role" class="hidden">
+    <button class="back" onclick="showScreen('menu-apps')">← Назад в Приложения</button>
+    <h2>🛒 Маркетплейс Девито</h2>
+    <p class="sub">Выберите режим работы на площадке</p>
+    <button class="btn green" onclick="openDevitoLogin('buyer')">🛍 Я покупатель</button>
+    <button class="btn devito" onclick="openDevitoLogin('seller')">🏪 Я продавец</button>
+    <button class="btn support" onclick="openJobGate('support')">🎧 Поддержка</button>
+  </div>
+  <div id="screen-support" class="hidden">
+    <button class="back" onclick="jobLogout()">← Выйти со смены</button>
+    <h2>🎧 Обращения в Поддержку</h2>
+    <div id="support-director-box" class="hidden"></div>
+    <div class="msg" id="support-action-msg"></div>
+    <div id="support-list"></div>
+  </div>
+  <div id="screen-devito-login" class="hidden">
+    <button class="back" onclick="showScreen('devito-role')">← Назад</button>
+    <h2 id="devito-login-title">Вход в Девито</h2>
+    <input id="dev-nick" placeholder="Ник вашего аккаунта">
+    <input type="password" id="dev-pass" placeholder="Пароль аккаунта">
+    <button class="btn devito" onclick="devitoLogin()">Войти на площадку</button>
+    <div class="msg err" id="dev-login-msg"></div>
+  </div>
+  <div id="screen-devito-buyer" class="hidden">
+    <button class="back" onclick="devitoLogout()">← Выйти из Девито</button>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="margin:0;">🛍 Девито: Витрина</h2>
+      <span id="dev-buyer-bal" style="color:#ffd166; font-weight:700; font-size:14px;">0 GC</span>
+    </div>
+    <div class="acct" style="margin-top:12px;">
+      <select id="dev-sort" onchange="renderDevitoBuyer()">
+        <option value="newest">Сначала новые</option>
+        <option value="cheap">Сначала дешёвые</option>
+        <option value="expensive">Сначала дорогие</option>
+      </select>
+      <div class="row">
+        <input type="number" id="dev-min-price" min="0" placeholder="Цена от (GC)" oninput="renderDevitoBuyer()">
+        <input type="number" id="dev-max-price" min="0" placeholder="Цена до (GC)" oninput="renderDevitoBuyer()">
+      </div>
+    </div>
+    <div class="msg" id="dev-buyer-msg"></div>
+    <h3>💬 Мои покупки и чаты</h3>
+    <div id="dev-buyer-orders"></div>
+    <h3>📦 Предложения продавцов</h3>
+    <div id="dev-items-list"></div>
+  </div>
+  <div id="screen-devito-seller" class="hidden">
+    <button class="back" onclick="devitoLogout()">← Выйти из Девито</button>
+    <h2>🏪 Кабинет Продавца</h2>
+    <div class="city-box" style="margin-bottom:14px;">
+      <div style="font-size:13px; color:#9fb0c9;">Баланс магазина (вывод на активную карту от 1000 GC):</div>
+      <div id="dev-seller-bal" style="font-size:24px; font-weight:800; color:#ffd166; margin:4px 0 10px;">0 GC</div>
+      <button class="btn small green" style="width:100%;" onclick="withdrawDevitoBalance()">💸 Вывести средства на карту</button>
+      <div class="msg" id="dev-withdraw-msg" style="margin-bottom:0;"></div>
+    </div>
+    <h3>➕ Выставить новый товар</h3>
+    <div class="acct">
+      <input type="file" id="dev-item-photo" accept="image/*">
+      <input id="dev-item-title" placeholder="Название товара">
+      <div class="row"><input type="number" id="dev-item-price" step="0.01" placeholder="Цена (GC)"><input type="number" id="dev-item-qty" min="1" placeholder="Кол-во"></div>
+      <input id="dev-item-addr" placeholder="Адрес, где можно забрать">
+      <button class="btn devito" style="margin-bottom:0;" onclick="publishDevitoItem()">Опубликовать объявление</button>
+      <div class="msg" id="dev-pub-msg" style="margin-bottom:0;"></div>
+    </div>
+    <h3>💬 Покупки и чаты</h3>
+    <div id="dev-seller-orders"></div>
+    <h3>📋 Мои товары и скидки</h3>
+    <div id="dev-seller-items"></div>
+  </div>
+  <div id="screen-devito-chat" class="hidden">
+    <button class="back" onclick="closeDevitoChat()">← Назад в Девито</button>
+    <h2 id="dev-chat-title" style="margin-bottom:4px;">💬 Чат по заказу</h2>
+    <p class="sub" id="dev-chat-sub" style="text-align:left; margin-bottom:6px;"></p>
+    <div id="dev-chat-status" style="font-size:12px; font-weight:700; margin-bottom:8px;"></div>
+    <div id="dev-chat-controls" style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;"></div>
+    <div class="msg" id="dev-chat-msg" style="margin:4px 0;"></div>
+    <div id="dev-chat-messages" class="chat-box"></div>
+    <div class="row">
+      <input id="dev-chat-input" placeholder="Напишите сообщение..." onkeydown="if(event.key==='Enter') sendDevitoChatMsg()">
+      <button class="btn small devito" onclick="sendDevitoChatMsg()">Отправить</button>
+    </div>
+  </div>
+
+  <!-- ИСТОРИЯ ТРАНЗАКЦИЙ -->
+  <div id="screen-transactions" class="hidden">
+    <button class="back" id="tx-back-btn" onclick="closeTransactionsScreen()">← Назад</button>
+    <h2 id="tx-screen-title">📜 История транзакций</h2>
+    <div id="tx-list" style="max-height: 400px; overflow-y: auto;"></div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО СООБЩЕНИЙ -->
+<div id="comment-modal" class="modal-overlay hidden" onclick="closeCommentModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">💬 Сообщение к операции</div>
+    <div id="modal-tx-meta" style="font-size:12px; color:#9fb0c9; margin-bottom:8px;"></div>
+    <div id="modal-tx-text" class="modal-body"></div>
+    <button class="btn small" style="width:100%;" onclick="closeCommentModal()">Закрыть</button>
+  </div>
+</div>
+
+<!-- ЭКРАН СМЕРТИ ПРИ 0 HP -->
+<div id="death-overlay" class="modal-overlay hidden">
+  <div class="death-box">
+    <div style="font-size:52px; margin-bottom:6px;">💀</div>
+    <h2 style="color:#ef4444; font-size:24px; margin:0 0 8px;">ТЫ УМЕР!</h2>
+    <p class="sub" style="color:#fecaca; margin-bottom:14px;">У вашего аккаунта закончилось здоровье (0 HP). Для продолжения игры необходимо переродиться.</p>
+    <select id="rebirth-card-select" style="margin-bottom:8px;"></select>
+    <button class="btn red" onclick="rebirthAccount()">✨ Переродиться за 100 000 GC</button>
+    <div id="rebirth-msg" class="msg err" style="margin-top:6px;"></div>
+  </div>
 </div>
 <script>
 const ADMIN_PASSWORD = '666306227666';
-const PRES_PASSWORD = '777'; 
+const PRES_PASSWORD = '777';
+const GOV_NICKS = ['кликкер','город','церковь','казино','праздники','мастерская','больница','школа','универ','колледж','армия','война','огурчик','дворники','гавиша','бнс','киллеры','тцк','коллекторы'];
+const CLICKER_GOAL = 10000000;
+const REBIRTH_COST = 100000;
 const STORE_KEY = 'goldcoin_accounts_v2';
+
+const JOB_LABELS = {
+  '': 'Безработный',
+  'police': '🚓 Полицейский', 'police_dep': '🚓 Зам. директора Полиции', 'police_dir': '🚓 Директор Полиции',
+  'bank': '🏦 Банкир', 'bank_dep': '🏦 Зам. директора Банка', 'bank_dir': '🏦 Директор Банка',
+  'church': '⛪ Священник', 'church_dep': '⛪ Зам. Верховного Патриарха', 'church_dir': '⛪ Верховный Патриарх',
+  'court': '⚖️ Обычный судья', 'court_dep': '⚖️ Зам. Верховного Судьи', 'court_dir': '⚖️ Верховный Судья',
+  'elder': '🏛 Старейшина Суда', 'elder_dep': '🏛 Зам. Главного Старейшины', 'elder_dir': '🏛 Главный Старейшина Суда',
+  'hospital': '🏥 Врач', 'hospital_dep': '🏥 Зам. Главврача', 'hospital_dir': '🏥 Главврач Больницы',
+  'school': '🏫 Учитель Школы', 'school_dep': '🏫 Завуч Школы', 'school_dir': '🏫 Директор Школы',
+  'univ': '🎓 Преподаватель Универа', 'univ_dep': '🎓 Проректор Универа', 'univ_dir': '🎓 Ректор Университета',
+  'college': '📚 Преподаватель Колледжа', 'college_dep': '📚 Зам. директора Колледжа', 'college_dir': '📚 Директор Колледжа',
+  'army': '🪖 Солдат Армии', 'army_dep': '🪖 Полковник Армии', 'army_dir': '🪖 Генерал Армии',
+  'war': '⚔️ Боец на Войне', 'war_dep': '⚔️ Зам. командующего фронтом', 'war_dir': '⚔️ Командующий фронтом',
+  'football': '⚽ Футболист', 'football_dep': '⚽ Зам. директора ФК', 'football_dir': '⚽ Директор Футбольного клуба',
+  'casino': '🎰 Рабочий Казино', 'casino_cashier': '🎰 Кассир Казино', 'casino_dep': '🎰 Зам. директора Казино', 'casino_dir': '🎰 Директор Казино',
+  'holiday': '🎉 Организатор праздников', 'holiday_dep': '🎉 Зам. директора Праздников', 'holiday_dir': '🎉 Директор Праздников',
+  'mint': '🪙 Мастер по монетам', 'mint_dep': '🪙 Зам. директора Мастерской', 'mint_dir': '🪙 Директор Чинки монет',
+  'ogurchik': '🥒 Танцовщица «Огурчика»', 'ogurchik_dep': '🥒 Администратор «Огурчика»', 'ogurchik_dir': '🥒 Владелец «Огурчика»',
+  'janitor': '🧹 Дворник', 'janitor_dep': '🧹 Зам. бригадира Дворников', 'janitor_dir': '🧹 Бригадир Дворников',
+  'gavisha': '📰 Репортёр Гавиши', 'gavisha_dep': '📰 Зам. главреда Гавиши', 'gavisha_dir': '📰 Главред Гавиши',
+  'bns': '🔌 Консультант БНС', 'bns_dep': '🔌 Зам. директора БНС', 'bns_dir': '🔌 Директор БНС',
+  'killer': '🎯 Киллер', 'killer_dep': '🎯 Зам. руководителя Киллеров', 'killer_dir': '🎯 Руководитель Киллеров',
+  'tck': '🪪 Сотрудник ТЦК', 'tck_dep': '🪪 Зам. начальника ТЦК', 'tck_dir': '🪪 Начальник ТЦК',
+  'collector': '💼 Коллектор', 'collector_dep': '💼 Зам. директора Коллекторов', 'collector_dir': '💼 Директор Коллекторов',
+  'support': '🎧 Оператор Поддержки', 'support_dep': '🎧 Зам. директора Поддержки', 'support_dir': '🎧 Директор Поддержки'
+};
+
 let currentNick = null;
+let activeCardNum = null;
+let pendingJobDept = null;
+let activeJobNick = null;
+let viewingTxCard = null;
+let txReturnScreen = 'my-bank';
+let devitoNick = null;
+let devitoRole = 'buyer';
+let activeOrderId = null;
 let salaryInterval = null;
+let wheelAngle = 0;
+let wheelSpinning = false;
+const msgTimers = {};
 
-function load() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
-  catch(e) { return []; }
+function formatNick(acc) {
+  if (!acc) return '';
+  let s = acc.nick;
+  if (acc.baptized) s += ' ✝️';
+  if (acc.isElderCouncil) s += ' 🏛';
+  if (acc.beeWidget === 'respect') s += ' 🐝';
+  return s;
 }
 
-function save(accs) { 
-  localStorage.setItem(STORE_KEY, JSON.stringify(accs)); 
+function renderWidgetsHtml(acc) {
+  let html = '';
+  if (acc.beeWidget === 'respect') html += `<span class="widget-chip widget-bee-ok">🐝 Уважает пчелок</span>`;
+  if (acc.beeWidget === 'disrespect') html += `<span class="widget-chip widget-bee-no"><span class="bee-ban-icon">🐝</span> Не уважает пчелок</span>`;
+  if (acc.workWidget) html += `<span class="widget-chip widget-work">${acc.workWidget}</span>`;
+  return html;
+}
+
+function getJobLabel(code) { return JOB_LABELS[code || ''] || 'Безработный'; }
+function isGovCard(num) { return GOV_NICKS.includes((num || '').toLowerCase()); }
+
+function applyAppTitle() {
+  const title = localStorage.getItem(STORE_KEY + '_app_title') || 'Город';
+  document.title = title;
+  const h1 = document.getElementById('main-app-title');
+  if (h1) h1.textContent = '🏙 ' + title;
+}
+
+function changeAppTitle() {
+  const inp = document.getElementById('admin-app-title-input'), val = inp ? inp.value.trim() : '';
+  if (!val) { showMsg('title-msg', 'Введите новое название!', 'err'); return; }
+  localStorage.setItem(STORE_KEY + '_app_title', val);
+  applyAppTitle();
   if (typeof window.syncToCloud === 'function') window.syncToCloud();
+  inp.value = ''; showMsg('title-msg', `Название изменено на «${val}»!`, 'ok');
 }
 
-function loadNotis() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY + '_notis')) || []; }
-  catch(e) { return []; }
+function showMsg(id, text, type) {
+  const el = document.getElementById(id); if (!el) return;
+  el.textContent = text; if (type) el.className = 'msg ' + type;
+  if (msgTimers[id]) clearTimeout(msgTimers[id]);
+  msgTimers[id] = setTimeout(() => { el.textContent = ''; }, 5000);
 }
 
-function saveNotis(notis) {
-  localStorage.setItem(STORE_KEY + '_notis', JSON.stringify(notis));
-  if (typeof window.syncToCloud === 'function') window.syncToCloud();
-}
-
-function isAccountBlocked(acc) {
-  if (!acc.blockedUntil) return false;
-  return new Date().getTime() < acc.blockedUntil;
-}
-
-function getRemainingBlockedHours(acc) {
-  if (!acc.blockedUntil) return 0;
-  const diff = acc.blockedUntil - new Date().getTime();
-  if (diff <= 0) return 0;
-  return (diff / (1000 * 60 * 60)).toFixed(1);
-}
-
-// Запуск фонового начисления тикающей зарплаты каждую секунду
-function startSalaryTicker() {
-  if (salaryInterval) clearInterval(salaryInterval);
-  salaryInterval = setInterval(() => {
-    if (!currentNick) return;
-    const accs = load();
-    const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
-    if (!acc || !acc.salary || acc.salary <= 0 || isAccountBlocked(acc)) return;
-
-    const now = new Date().getTime();
-    if (!acc.lastSalaryUpdate) acc.lastSalaryUpdate = now;
-    
-    const diffSeconds = (now - acc.lastSalaryUpdate) / 1000;
-    if (diffSeconds <= 0) return;
-
-    let periodSeconds = 1;
-    if (acc.salaryPeriod === 'minute') periodSeconds = 60;
-    if (acc.salaryPeriod === 'hour') periodSeconds = 3600;
-    if (acc.salaryPeriod === 'day') periodSeconds = 86400;
-    if (acc.salaryPeriod === 'week') periodSeconds = 604800;
-    if (acc.salaryPeriod === 'year') periodSeconds = 31536000;
-
-    const earned = (acc.salary / periodSeconds) * diffSeconds;
-    acc.balance = parseFloat((acc.balance + earned).toFixed(5));
-    acc.lastSalaryUpdate = now;
-
-    localStorage.setItem(STORE_KEY, JSON.stringify(accs));
-    
-    const balEl = document.getElementById('my-balance');
-    if (balEl) balEl.textContent = parseFloat(acc.balance.toFixed(2)) + ' GC';
-  }, 1000);
-}
-
-function pushTickerToCloud() {
-  const accs = load();
-  save(accs);
-}
-function showScreen(name) {
-  ['home','admin-login','admin','pres-login','president','my-login','my'].forEach(s => {
-    const el = document.getElementById('screen-'+s);
-    if(el) el.classList.toggle('hidden', s !== name);
+function load() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch(e) { return []; } }
+function save(v) { localStorage.setItem(STORE_KEY, JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadCards() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_cards')) || []; } catch(e) { return []; } }
+function saveCards(v) { localStorage.setItem(STORE_KEY + '_cards', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadInvoices() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_invoices')) || []; } catch(e) { return []; } }
+function saveInvoices(v) { localStorage.setItem(STORE_KEY + '_invoices', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadGavisha() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_gavisha')) || []; } catch(e) { return []; } }
+function saveGavisha(v) { localStorage.setItem(STORE_KEY + '_gavisha', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadBns() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_bns')) || []; } catch(e) { return []; } }
+function saveBns(v) { localStorage.setItem(STORE_KEY + '_bns', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadPoliceReports() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_police_reports')) || []; } catch(e) { return []; } }
+function savePoliceReports(v) { localStorage.setItem(STORE_KEY + '_police_reports', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadClubState() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_club_state')) || { activeDancer: null, spinDir: 'idle' }; } catch(e) { return { activeDancer: null, spinDir: 'idle' }; } }
+function saveClubState(v) { localStorage.setItem(STORE_KEY + '_club_state', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadDevitoItems() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_devito_items')) || []; } catch(e) { return []; } }
+function saveDevitoItems(v) { localStorage.setItem(STORE_KEY + '_devito_items', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadDevitoOrders() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_devito_orders')) || []; } catch(e) { return []; } }
+function saveDevitoOrders(v) { localStorage.setItem(STORE_KEY + '_devito_orders', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadSupportTickets() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_support_tickets')) || []; } catch(e) { return []; } }
+function saveSupportTickets(v) { localStorage.setItem(STORE_KEY + '_support_tickets', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function loadNotis() { try { return JSON.parse(localStorage.getItem(STORE_KEY + '_notis')) || []; } catch(e) { return []; } }
+function saveNotis(v) { localStorage.setItem(STORE_KEY + '_notis', JSON.stringify(v)); if (typeof window.syncToCloud === 'function') window.syncToCloud(); }
+function ensureGovCards(shouldSave = true) {
+  const cards = loadCards();
+  let modified = false;
+  GOV_NICKS.forEach(gn => {
+    if (!cards.some(c => c.num.toLowerCase() === gn)) {
+      cards.unshift({ num: gn, pin: 'GOV_' + Math.random().toString(36).slice(2), balance: 0, blockedUntil: null, ownerNick: '', transactions: [], isGov: true });
+      modified = true;
+    }
   });
-  if (name !== 'my' && salaryInterval) clearInterval(salaryInterval);
-  
-  if (name === 'admin') renderAdmin();
-  if (name === 'president') renderPresident();
-}
-
-function adminLogin() {
-  const p = document.getElementById('admin-pass').value;
-  if (p === ADMIN_PASSWORD) showScreen('admin');
-  else document.getElementById('admin-msg').textContent = 'Неверный пароль';
-}
-
-function presLogin() {
-  const p = document.getElementById('pres-pass').value;
-  if (p === PRES_PASSWORD) showScreen('president');
-  else document.getElementById('pres-msg').textContent = 'Неверный код Президента';
-}
-
-function createAccount() {
-  const nick = document.getElementById('new-nick').value.trim();
-  const pass = document.getElementById('new-pass').value;
-  const msg = document.getElementById('create-msg');
-  if (!nick || !pass) { msg.textContent = 'Заполните ник и пароль'; msg.className='msg err'; return; }
-  const accs = load();
-  if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) {
-    msg.textContent = 'Такой ник уже есть'; msg.className='msg err'; return;
+  if (modified) {
+    if (shouldSave) saveCards(cards);
+    else localStorage.setItem(STORE_KEY + '_cards', JSON.stringify(cards));
   }
-  accs.push({ nick, pass, balance: 0, blockedUntil: null, salary: 0, salaryPeriod: 'hour', lastSalaryUpdate: null });
-  save(accs);
-  document.getElementById('new-nick').value = '';
-  document.getElementById('new-pass').value = '';
-  msg.textContent = 'Счёт «' + nick + '» создан'; msg.className='msg ok';
-  renderAdmin();
 }
 
-function myLogin() {
-  const nick = document.getElementById('my-nick').value.trim();
-  const pass = document.getElementById('my-pass').value;
-  const msg = document.getElementById('my-msg');
+function addCardTx(card, type, amount, desc, comment = '') {
+  if (!card.transactions) card.transactions = [];
+  const val = parseFloat(Math.abs(amount).toFixed(2));
+  if (val <= 0) return;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + now.toLocaleDateString();
+  card.transactions.unshift({ type, amount: val, desc, comment: comment ? comment.trim() : '', date: timeStr });
+  if (card.transactions.length > 50) card.transactions.pop();
+}
+
+function pushAccNoti(nick, text, extra = {}) {
   const accs = load();
-  const acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
-  
-  if (acc) {
-    if (isAccountBlocked(acc)) {
-      msg.textContent = `Ваш счёт заблокирован Президентом! Осталось: ${getRemainingBlockedHours(acc)} ч.`;
+  const acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!acc) return;
+  if (!acc.notifications) acc.notifications = [];
+  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  acc.notifications.unshift({ id: Date.now() + Math.random(), text, date: timeStr, ...extra });
+  if (acc.notifications.length > 30) acc.notifications.pop();
+  save(accs);
+}
+
+function isCardBlocked(c) { return c && c.blockedUntil ? Date.now() < c.blockedUntil : false; }
+function getRemainingBlockedHours(c) {
+  if (!c || !c.blockedUntil) return 0;
+  const d = c.blockedUntil - Date.now();
+  return d <= 0 ? 0 : (d / 3600000).toFixed(1);
+}
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+function syncAllSalaries(pushToCloud = false) {
+  const accs = load(), cards = loadCards();
+  let accChanged = false, cardChanged = false;
+  const now = Date.now(), todayKey = getTodayKey();
+  const MONTH_MS = 30 * 86400 * 1000;
+
+  accs.forEach(acc => {
+    if (acc.hp === undefined) { acc.hp = 100; accChanged = true; }
+    if (acc.lastHpDay !== todayKey) {
+      acc.hp = 100;
+      acc.lastHpDay = todayKey;
+      accChanged = true;
+    }
+    if (acc.age === undefined) { acc.age = 18; acc.lastAgeUpdate = now; accChanged = true; }
+    if (!acc.lastAgeUpdate) { acc.lastAgeUpdate = now; accChanged = true; }
+    const ageMonths = Math.floor((now - acc.lastAgeUpdate) / MONTH_MS);
+    if (ageMonths >= 1) {
+      acc.age += ageMonths;
+      acc.lastAgeUpdate += ageMonths * MONTH_MS;
+      accChanged = true;
+    }
+    if (acc.armyUntil && now >= acc.armyUntil) {
+      acc.armyUntil = null;
+      accChanged = true;
+    }
+    if (acc.salary && acc.salary !== 0 && !acc.exiled && (acc.hp > 0)) {
+      if (!acc.lastSalaryUpdate) acc.lastSalaryUpdate = now;
+      const pMap = { second: 1000, minute: 60000, hour: 3600000, day: 86400000, week: 604800000, month: 2592000000, year: 31536000000 };
+      const pMs = pMap[acc.salaryPeriod] || 3600000;
+      const periods = Math.floor((now - acc.lastSalaryUpdate) / pMs);
+      if (periods >= 1) {
+        const delta = parseFloat((acc.salary * periods).toFixed(2));
+        const myCard = cards.find(c => !c.isGov && (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+        if (delta !== 0 && myCard) {
+          myCard.balance = parseFloat((myCard.balance + delta).toFixed(2));
+          addCardTx(myCard, delta > 0 ? 'plus' : 'minus', Math.abs(delta), delta > 0 ? 'зарплата' : 'налог / вычет');
+          cardChanged = true;
+        }
+        acc.lastSalaryUpdate += periods * pMs;
+        accChanged = true;
+      }
+    }
+  });
+
+  if (accChanged) localStorage.setItem(STORE_KEY, JSON.stringify(accs));
+  if (cardChanged) localStorage.setItem(STORE_KEY + '_cards', JSON.stringify(cards));
+  if ((accChanged || cardChanged) && pushToCloud && typeof window.syncToCloud === 'function') window.syncToCloud();
+}
+
+function checkDeathOverlay() {
+  const overlay = document.getElementById('death-overlay');
+  if (!overlay) return;
+  if (!currentNick) { overlay.classList.add('hidden'); return; }
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (acc && (acc.hp ?? 100) <= 0) {
+    overlay.classList.remove('hidden');
+    const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+    const sel = document.getElementById('rebirth-card-select');
+    if (sel) {
+      sel.innerHTML = myCards.length === 0 ? '<option value="">Нет привязанных карт</option>' :
+        myCards.map(c => `<option value="${c.num}">💳 ${c.num} (${parseFloat(c.balance.toFixed(2))} GC)</option>`).join('');
+    }
+  } else {
+    overlay.classList.add('hidden');
+  }
+}
+
+function rebirthAccount() {
+  if (!currentNick) return;
+  const sel = document.getElementById('rebirth-card-select');
+  const cardNum = sel ? sel.value : '';
+  if (!cardNum) { showMsg('rebirth-msg', 'Сначала привяжите карту к аккаунту!', 'err'); return; }
+  const accs = load(), cards = loadCards();
+  const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  const card = cards.find(c => c.num.toLowerCase() === cardNum.toLowerCase());
+  if (!acc || !card) return;
+  if (card.balance < REBIRTH_COST) { showMsg('rebirth-msg', `Недостаточно средств! Нужно ${REBIRTH_COST} GC.`, 'err'); return; }
+  card.balance = parseFloat((card.balance - REBIRTH_COST).toFixed(2));
+  addCardTx(card, 'minus', REBIRTH_COST, 'перерождение после смерти');
+  acc.hp = 100;
+  save(accs); saveCards(cards);
+  document.getElementById('death-overlay').classList.add('hidden');
+  refreshActiveScreens();
+}
+function isUserTyping() {
+  const a = document.activeElement;
+  return a && (a.tagName === 'INPUT' || a.tagName === 'SELECT');
+}
+
+function refreshActiveScreens() {
+  checkDeathOverlay();
+  if (typeof window.renderAccount === 'function' && !document.getElementById('screen-account').classList.contains('hidden')) window.renderAccount();
+  if (typeof window.renderMyBank === 'function' && !document.getElementById('screen-my-bank').classList.contains('hidden')) window.renderMyBank();
+  if (typeof window.updateClickerScreen === 'function') window.updateClickerScreen();
+  if (typeof window.renderOgurchikViewer === 'function' && !document.getElementById('screen-ogurchik-viewer').classList.contains('hidden')) window.renderOgurchikViewer();
+  if (typeof window.renderDevitoChat === 'function' && !document.getElementById('screen-devito-chat').classList.contains('hidden')) window.renderDevitoChat(false);
+  if (!isUserTyping()) {
+    ['admin','president','police','bank','church','court','elder','hospital','school','univ','college','army','war','football','casino','holiday','mint','ogurchik','janitor','gavisha','gavisha-public','bns','bns-store','killer','tck','collector','support','devito-buyer','devito-seller','city-services'].forEach(sc => {
+      const el = document.getElementById('screen-' + sc);
+      if (el && !el.classList.contains('hidden')) {
+        const fn = 'render' + sc.split('-').map(p => p.toUpperCase() + p.slice(1)).join('');
+        if (typeof window[fn] === 'function') window[fn]();
+      }
+    });
+  }
+  if (typeof window.renderTransactions === 'function' && !document.getElementById('screen-transactions').classList.contains('hidden')) window.renderTransactions();
+}
+
+function startGlobalSalaryTicker() {
+  if (salaryInterval) clearInterval(salaryInterval);
+  salaryInterval = setInterval(() => { syncAllSalaries(true); refreshActiveScreens(); }, 1000);
+}
+
+function isInArmyService(acc) {
+  return acc && acc.armyUntil && Date.now() < acc.armyUntil;
+}
+
+function showScreen(name) {
+  ensureGovCards(false);
+  syncAllSalaries(true);
+  const appScreens = ['my-bank','casino-wheel','city-services','ogurchik-viewer','bns-store','gavisha-public','clicker-login','clicker-game','devito-role','devito-login','devito-buyer','devito-seller','devito-chat'];
+  if (currentNick && appScreens.includes(name)) {
+    const me = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+    if (isInArmyService(me)) {
+      alert('🪖 Вы проходите службу в Армии (1 месяц)! Вход в приложения запрещён. В аккаунте доступны только зарплата и переводы.');
       return;
     }
-    currentNick = acc.nick;
-    acc.lastSalaryUpdate = new Date().getTime();
-    localStorage.setItem(STORE_KEY, JSON.stringify(accs));
-    showScreen('my');
-    updateCurrentScreen();
-    startSalaryTicker();
-  } else {
-    msg.textContent = 'Неверный ник или пароль';
+  }
+  document.querySelectorAll('.card > div').forEach(div => {
+    if (div.id && div.id.startsWith('screen-')) div.classList.toggle('hidden', div.id !== 'screen-' + name);
+  });
+  refreshActiveScreens();
+}
+
+function renderDirectorPanel(dept, containerId, rolesList) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+  const accs = load();
+  const me = accs.find(a => a.nick.toLowerCase() === (activeJobNick || '').toLowerCase());
+  const isBoss = me && (me.job === dept + '_dir' || me.job === dept + '_dep');
+  if (!isBoss) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+  box.classList.remove('hidden');
+  const validJobs = rolesList || [dept];
+  const staff = accs.filter(a => validJobs.includes(a.job));
+  const roleSel = validJobs.length > 1 ? `<select id="dir-role-select-${dept}">${validJobs.map(r => `<option value="${r}">${JOB_LABELS[r]}</option>`).join('')}</select>` : '';
+  const staffHtml = staff.length === 0 ? '<div class="pw">Сотрудников пока нет</div>' :
+    staff.map(s => `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <span style="font-size:13px;">${formatNick(s)} <span class="pw">(${getJobLabel(s.job)})</span></span>
+      <button class="btn tiny red" onclick="directorFire('${dept}', '${s.nick}')">Уволить</button>
+    </div>`).join('');
+  box.innerHTML = `<div class="city-box" style="margin-bottom:14px;">
+    <div class="name" style="margin-bottom:6px;">👥 Управление штатом (${getJobLabel(me.job)})</div>
+    <input id="dir-hire-input-${dept}" placeholder="Ник гражданина">
+    ${roleSel}
+    <button class="btn small green" style="width:100%; margin-top:6px;" onclick="directorHire('${dept}')">Принять на работу</button>
+    <div class="msg" id="dir-msg-${dept}" style="margin:4px 0;"></div>
+    <div style="margin-top:8px;">${staffHtml}</div>
+  </div>`;
+}
+
+function directorHire(dept) {
+  const inp = document.getElementById(`dir-hire-input-${dept}`), sel = document.getElementById(`dir-role-select-${dept}`);
+  const nick = inp ? inp.value.trim() : '', targetRole = sel ? sel.value : dept;
+  if (!nick) { showMsg(`dir-msg-${dept}`, 'Введите ник!', 'err'); return; }
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target) { showMsg(`dir-msg-${dept}`, 'Гражданин не найден!', 'err'); return; }
+  if (target.exiled) { showMsg(`dir-msg-${dept}`, 'Гражданин изгнан из города!', 'err'); return; }
+  if (dept === 'elder' && !target.isElderCouncil) { showMsg(`dir-msg-${dept}`, 'Только для членов Совета Старейшин!', 'err'); return; }
+  if (target.job && (target.job.endsWith('_dir') || target.job.endsWith('_dep'))) { showMsg(`dir-msg-${dept}`, 'Нельзя переназначить руководителя!', 'err'); return; }
+  target.job = targetRole; save(accs); inp.value = '';
+  pushAccNoti(target.nick, `💼 Вы приняты на работу: ${getJobLabel(targetRole)}`);
+  refreshActiveScreens(); showMsg(`dir-msg-${dept}`, `${target.nick} принят на работу!`, 'ok');
+}
+
+function directorFire(dept, nick) {
+  if (!confirm(`Уволить сотрудника ${nick}?`)) return;
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (target && target.job && target.job.startsWith(dept)) {
+    target.job = ''; save(accs);
+    pushAccNoti(target.nick, '❌ Вы уволены с работы руководителем.');
+    refreshActiveScreens();
   }
 }
 
-function myLogout() {
-  pushTickerToCloud();
-  currentNick = null;
-  if (salaryInterval) clearInterval(salaryInterval);
-  showScreen('home');
+function accLogin() {
+  syncAllSalaries(false);
+  const nick = document.getElementById('acc-nick').value.trim(), pass = document.getElementById('acc-pass').value;
+  const acc = load().find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (!acc) { showMsg('acc-msg', 'Неверный ник или пароль', 'err'); return; }
+  if (acc.exiled) { showMsg('acc-msg', 'Вы изгнаны из города по решению Президента!', 'err'); return; }
+  document.getElementById('acc-nick').value = ''; document.getElementById('acc-pass').value = '';
+  currentNick = acc.nick;
+  const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  activeCardNum = myCards.length > 0 ? myCards.num : null;
+  showScreen('account');
 }
 
-function updateCurrentScreen() {
+function accLogout() { syncAllSalaries(true); currentNick = null; activeCardNum = null; showScreen('home'); }
+
+function toggleSleep() {
+  if (!currentNick) return;
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  const hour = new Date().getHours();
+  if (!acc.sleepingSince) {
+    if (hour < 20 && hour >= 7) {
+      showMsg('bonus-msg', '😴 Лечь спать можно только с 20:00 до 07:00!', 'err');
+      return;
+    }
+    acc.sleepingSince = Date.now();
+    save(accs); renderAccount();
+  } else {
+    const sleptHours = Math.max(0, (Date.now() - acc.sleepingSince) / 3600000);
+    const healed = Math.floor(sleptHours * 10);
+    acc.hp = Math.min(100, (acc.hp ?? 100) + healed);
+    acc.sleepingSince = null;
+    save(accs); renderAccount();
+    showMsg('bonus-msg', `☀️ Вы проснулись! Восстановлено +${healed} HP (проспали ${sleptHours.toFixed(1)} ч.)`, 'ok');
+  }
+}
+
+function buyAccountUpgrade() {
+  if (!currentNick) return;
+  const accs = load(), cards = loadCards();
+  const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  const lvl = acc.upgradeLevel || 0;
+  if (lvl >= 10) return;
+  const cost = (lvl + 1) * 100;
+  const card = cards.find(c => c.num === activeCardNum) || cards.find(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  if (!card) { showMsg('bonus-msg', 'Сначала привяжите банковскую карту!', 'err'); return; }
+  if (card.balance < cost) { showMsg('bonus-msg', `Недостаточно средств на карте (${cost} GC)!`, 'err'); return; }
+  card.balance = parseFloat((card.balance - cost).toFixed(2));
+  addCardTx(card, 'minus', cost, `улучшение аккаунта (Уровень ${lvl + 1})`);
+  acc.upgradeLevel = lvl + 1;
+  save(accs); saveCards(cards); renderAccount();
+  showMsg('bonus-msg', `⭐ Куплено улучшение аккаунта Уровень ${acc.upgradeLevel} за ${cost} GC!`, 'ok');
+}
+function respondTckNoti(notiId, action) {
   if (!currentNick) return;
   const accs = load();
   const acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
-  if (acc) {
-    if (isAccountBlocked(acc)) {
-      alert(`Ваш счёт был заблокирован!`);
-      myLogout();
-      return;
-    }
-    document.getElementById('my-title').textContent = 'Счёт: ' + acc.nick;
-    document.getElementById('my-balance').textContent = parseFloat(acc.balance.toFixed(2)) + ' GC';
-    
-    const desc = document.getElementById('my-salary-desc');
-    if (acc.salary && acc.salary > 0) {
-      const pText = { second:'секунду', minute:'минуту', hour:'час', day:'день', week:'неделю', year:'год' }[acc.salaryPeriod];
-      desc.textContent = `Зарплата: ${acc.salary} GC каждую ${pText} (начисляется)`;
-    } else {
-      desc.textContent = 'Заработок не настроен';
-    }
+  if (!acc || !acc.notifications) return;
+  const noti = acc.notifications.find(n => n.id === notiId);
+  if (!noti || noti.tckHandled) return;
+  noti.tckHandled = true;
+  if (action === 'accept') {
+    acc.armyUntil = Date.now() + 30 * 86400 * 1000;
+    noti.text += ' → ✅ Вы согласились пойти в Армию на 1 месяц.';
+    acc.notifications.unshift({ id: Date.now() + 1, text: '🪖 Вы зачислены на службу в Армию на 1 месяц (приложения закрыты).', date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  } else {
+    const code = String(Math.floor(1000 + Math.random() * 9000));
+    acc.escapeCode = code;
+    noti.text += ` → 🏃 Вы нажали БЕЖАТЬ! Ваш код побега: ${code}`;
+    acc.notifications.unshift({ id: Date.now() + 1, text: `🏃 Вы сбежали от повестки ТЦК! Ваш секретный код побега: ${code}`, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   }
+  save(accs); renderAccount();
 }
 
+function clearAccountNotis() {
+  if (!currentNick) return;
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (acc) { acc.notifications = []; save(accs); renderAccount(); }
+}
+
+function renderAccount() {
+  if (!currentNick) return;
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  if (acc.exiled) { alert('Вы изгнаны из города!'); accLogout(); return; }
+  document.getElementById('acc-title').textContent = '👤 ' + formatNick(acc);
+  const hpVal = Math.max(0, Math.min(100, acc.hp ?? 100));
+  const armyTag = isInArmyService(acc) ? ` • <span class="badge-blocked">🪖 В АРМИИ (${Math.ceil((acc.armyUntil - Date.now()) / 86400000)} дн.)</span>` : '';
+  const warTag = acc.warContract ? ` • <span class="badge-blocked">⚔️ КОНТРАКТ ВОЙНЫ</span>` : '';
+  document.getElementById('acc-age-hp').innerHTML = `Возраст: <b>${acc.age ?? 18} лет</b> • Здоровье: <b>${hpVal}/100 HP</b>${armyTag}${warTag}`;
+  document.getElementById('acc-hp-bar').style.width = hpVal + '%';
+  document.getElementById('acc-widgets').innerHTML = renderWidgetsHtml(acc);
+
+  const desc = document.getElementById('acc-salary-desc');
+  if (acc.salary && acc.salary !== 0) {
+    const pText = { second:'секунду', minute:'минуту', hour:'час', day:'день', week:'неделю', month:'месяц', year:'год' }[acc.salaryPeriod];
+    desc.textContent = acc.salary > 0 ? `Зарплата: +${acc.salary} GC каждый ${pText}` : `Налог / вычет: ${acc.salary} GC каждый ${pText}`;
+    desc.style.color = acc.salary > 0 ? '#6ee7a0' : '#ff7b7b';
+  } else { desc.textContent = 'Зарплата не настроена'; desc.style.color = '#9fb0c9'; }
+
+  const sleepBox = document.getElementById('acc-sleep-box');
+  if (sleepBox) {
+    if (acc.sleepingSince) {
+      const hrs = ((Date.now() - acc.sleepingSince) / 3600000).toFixed(2);
+      sleepBox.innerHTML = `<div class="name">😴 Вы сейчас спите (${hrs} ч.)</div><div class="pw" style="margin:4px 0;">+10 HP за каждый полный час сна</div><button class="btn small green" style="width:100%;" onclick="toggleSleep()">☀️ Проснуться</button>`;
+    } else {
+      sleepBox.innerHTML = `<div class="name">🛏 Отдых и сон</div><div class="pw" style="margin:4px 0;">Доступно с 20:00 до 07:00 (+10 HP за час)</div><button class="btn small" style="width:100%;" onclick="toggleSleep()">😴 Лечь спать</button>`;
+    }
+  }
+
+  const upgBox = document.getElementById('acc-upgrades-box');
+  if (upgBox) {
+    const lvl = acc.upgradeLevel || 0;
+    if (lvl >= 10) {
+      upgBox.innerHTML = `<div class="name">⭐ Улучшения аккаунта: Максимум (10 / 10)</div><div class="pw">Все 10 уровней улучшений куплены!</div>`;
+    } else {
+      const nextCost = (lvl + 1) * 100;
+      upgBox.innerHTML = `<div class="name">⭐ Улучшения аккаунта (${lvl} / 10)</div><div class="pw" style="margin:4px 0;">Следующее улучшение: <b>Уровень ${lvl + 1}</b></div><button class="btn small orange" style="width:100%;" onclick="buyAccountUpgrade()">Купить Уровень ${lvl + 1} за ${nextCost} GC</button>`;
+    }
+  }
+
+  const notisBox = document.getElementById('acc-notis-box'), notisList = document.getElementById('acc-notis-list');
+  const myNotis = acc.notifications || [];
+  if (myNotis.length === 0) { notisBox.classList.add('hidden'); }
+  else {
+    notisBox.classList.remove('hidden');
+    notisList.innerHTML = myNotis.map(n => {
+      const tckBtns = (n.isTck && !n.tckHandled) ? `<div class="row" style="margin-top:6px;"><button class="btn small green" onclick="respondTckNoti(${n.id},'accept')">✅ Согласиться</button><button class="btn small red" onclick="respondTckNoti(${n.id},'run')">🏃 Бежать</button></div>` : '';
+      return `<div class="noti-item" style="padding:8px; margin:4px 0;"><div style="font-size:13px;">${n.text}</div>${tckBtns}<div class="tx-date">${n.date}</div></div>`;
+    }).join('');
+  }
+
+  const jobBox = document.getElementById('acc-job-box');
+  if (acc.job) {
+    const dept = acc.job.split('_')[0];
+    jobBox.classList.remove('hidden');
+    jobBox.innerHTML = `<div class="city-box" style="margin:0;"><div class="name">💼 Ваша работа: ${getJobLabel(acc.job)}</div><button class="btn small green" style="width:100%; margin-top:6px;" onclick="quickEnterJob('${dept}')">🚪 Выйти на смену (-5 HP)</button></div>`;
+  } else { jobBox.classList.add('hidden'); jobBox.innerHTML = ''; }
+
+  const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  document.getElementById('acc-cards-list').innerHTML = myCards.length === 0 ? '<p class="sub" style="text-align:left;">Привязанных карт пока нет</p>' :
+    myCards.map(c => `<div class="bank-card-ui"><div style="display:flex; justify-content:space-between;"><span class="name">💳 Карта: ${c.num}</span><button class="btn tiny red" onclick="unlinkCard('${c.num}')">Отвязать</button></div><div class="bal" style="font-size:18px; font-weight:800;">${parseFloat(c.balance.toFixed(2))} GC</div></div>`).join('');
+}
+
+function linkCardToAccount() {
+  if (!currentNick) return;
+  const num = document.getElementById('link-card-num').value.trim(), pin = document.getElementById('link-card-pin').value;
+  if (!num || !pin) { showMsg('link-card-msg', 'Введите номер карты и PIN!', 'err'); return; }
+  const cards = loadCards(), card = cards.find(c => c.num.toLowerCase() === num.toLowerCase() && c.pin === pin);
+  if (!card || card.isGov) { showMsg('link-card-msg', 'Карта не найдена или неверный PIN!', 'err'); return; }
+  if (card.ownerNick && card.ownerNick.toLowerCase() !== currentNick.toLowerCase()) { showMsg('link-card-msg', 'Эта карта уже привязана к другому аккаунту!', 'err'); return; }
+  card.ownerNick = currentNick; saveCards(cards);
+  if (!activeCardNum) activeCardNum = card.num;
+  document.getElementById('link-card-num').value = ''; document.getElementById('link-card-pin').value = '';
+  showMsg('link-card-msg', `Карта ${card.num} привязана к аккаунту!`, 'ok'); renderAccount();
+}
+
+function unlinkCard(num) {
+  if (!confirm(`Отвязать карту ${num}?`)) return;
+  const cards = loadCards(), card = cards.find(c => c.num.toLowerCase() === num.toLowerCase());
+  if (card) { card.ownerNick = ''; saveCards(cards); if (activeCardNum === num) activeCardNum = null; renderAccount(); }
+}
+
+function openMyBank() { showScreen('my-bank'); }
+function onSelectActiveCard() { activeCardNum = document.getElementById('active-card-select').value; renderMyBank(); }
+
+function renderMyBank() {
+  const noAcc = document.getElementById('bank-no-acc-box'), mainBox = document.getElementById('bank-main-box');
+  if (!currentNick) { noAcc.classList.remove('hidden'); mainBox.classList.add('hidden'); return; }
+  noAcc.classList.add('hidden'); mainBox.classList.remove('hidden');
+  const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === currentNick.toLowerCase());
+  const sel = document.getElementById('active-card-select'), disp = document.getElementById('active-card-display');
+  if (myCards.length === 0) {
+    sel.innerHTML = '<option value="">Нет привязанных карт</option>';
+    disp.innerHTML = '<div class="pw">Привяжите карту в «👤 Моём аккаунте»!</div>';
+    return;
+  }
+  if (!activeCardNum || !myCards.some(c => c.num === activeCardNum)) activeCardNum = myCards.num;
+  sel.innerHTML = myCards.map(c => `<option value="${c.num}" ${c.num === activeCardNum ? 'selected' : ''}>💳 ${c.num} (${parseFloat(c.balance.toFixed(2))} GC)</option>`).join('');
+  const active = myCards.find(c => c.num === activeCardNum);
+  const blk = isCardBlocked(active);
+  disp.innerHTML = `<div class="pw">Карта аккаунта: <b>${active.num}</b> ${blk ? `<span class="badge-blocked">ЗАБЛОКИРОВАНА (${getRemainingBlockedHours(active)}ч)</span>` : ''}</div><div class="balance-big" style="margin:6px 0 0;">${parseFloat(active.balance.toFixed(2))} GC</div>`;
+
+  const invSec = document.getElementById('my-invoices-section'), invList = document.getElementById('my-invoices-list');
+  const myCardNums = myCards.map(c => c.num.toLowerCase());
+  const myInvs = loadInvoices().filter(i => myCardNums.includes((i.toCard || '').toLowerCase()));
+  if (myInvs.length === 0) { invSec.classList.add('hidden'); }
+  else {
+    invSec.classList.remove('hidden');
+    invList.innerHTML = myInvs.map(i => `<div class="acct"><div class="name">🧾 Счёт на карту ${i.toCard} от ${i.from}: <b>${i.amount} GC</b></div><div class="pw">${i.reason} (${i.date})</div><div class="row" style="margin-top:6px;"><button class="btn small green" onclick="payInvoice(${i.id})">Оплатить</button><button class="btn small red" onclick="declineInvoice(${i.id})">Отклонить</button></div></div>`).join('');
+  }
+}
 function requestBonus() {
   const sum = parseFloat(prompt('Какую сумму премии вы хотите потребовать у Президента (в GC)?'));
-  const msg = document.getElementById('bonus-msg');
-  if (isNaN(sum) || sum <= 0) {
-    msg.textContent = 'Введите корректную сумму!'; msg.className = 'msg err'; return;
-  }
-  pushTickerToCloud();
-  
+  if (isNaN(sum) || sum <= 0) { showMsg('bonus-msg', 'Введите корректную сумму!', 'err'); return; }
   const notis = loadNotis();
-  notis.push({ id: new Date().getTime(), from: currentNick, amount: sum });
+  notis.push({ id: Date.now(), from: currentNick, amount: sum });
   saveNotis(notis);
-  
-  msg.textContent = `Запрос на премию в размере ${sum} GC отправлен Президентом!`;
-  msg.className = 'msg ok';
+  showMsg('bonus-msg', `Запрос на премию ${sum} GC отправлен Президенту!`, 'ok');
 }
 
 function doTransfer() {
-  pushTickerToCloud();
-  const toNick = document.getElementById('tr-nick').value.trim();
-  const amount = parseFloat(document.getElementById('tr-amount').value);
-  const msg = document.getElementById('tr-msg');
-  if (!toNick || isNaN(amount) || amount <= 0) { msg.textContent = 'Неверная сумма или ник'; msg.className='msg err'; return; }
-  
-  const accs = load();
-  const fromAcc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
-  const toAcc = accs.find(a => a.nick.toLowerCase() === toNick.toLowerCase());
-  
-  if (isAccountBlocked(fromAcc)) { msg.textContent = 'Ваш счёт заблокирован!'; msg.className='msg err'; return; }
-  if (!toAcc) { msg.textContent = 'Получатель не найден'; msg.className='msg err'; return; }
-  if (fromAcc.balance < amount) { msg.textContent = 'Недостаточно средств'; msg.className='msg err'; return; }
-  
-  fromAcc.balance = parseFloat((fromAcc.balance - amount).toFixed(2));
-  toAcc.balance = parseFloat((toAcc.balance + amount).toFixed(2));
-  
-  save(accs);
-  updateCurrentScreen();
-  document.getElementById('tr-nick').value = '';
-  document.getElementById('tr-amount').value = '';
-  msg.textContent = 'Перевод выполнен!'; msg.className='msg ok';
-}
-function deleteAccount(nick) {
-  if (!confirm('Удалить счёт ' + nick + '?')) return;
-  let accs = load();
-  accs = accs.filter(a => a.nick.toLowerCase() !== nick.toLowerCase());
-  save(accs);
-  renderAdmin();
-}
-
-function addMoney(idx) {
-  const amountInput = document.getElementById(`input-${idx}`);
-  const amount = parseFloat(amountInput.value);
-  if (isNaN(amount) || amount <= 0) { alert('Введите корректную сумму больше 0'); return; }
-  const accs = load();
-  accs[idx].balance = parseFloat((accs[idx].balance + amount).toFixed(2));
-  save(accs);
-  renderAdmin();
-}
-
-function renderAdmin() {
-  const accs = load();
-  const list = document.getElementById('admin-list');
-  if (!list) return;
-  list.innerHTML = '';
-  accs.forEach((a, idx) => {
-    const div = document.createElement('div');
-    div.className = 'acct';
-    const blockedLabel = isAccountBlocked(a) ? ` <span class="badge-blocked">БАН (${getRemainingBlockedHours(a)}ч)</span>` : '';
-    div.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="name">${a.nick}${blockedLabel}</span>
-        <button class="del" onclick="deleteAccount('${a.nick}')">×</button>
-      </div>
-      <div class="bal">${parseFloat(a.balance.toFixed(2))} GC</div>
-      <div class="pw" style="margin-bottom:8px;">Пароль: ${a.pass}</div>
-      <div class="row">
-        <input type="number" id="input-${idx}" step="0.01" placeholder="Сумма">
-        <button class="btn small green" onclick="addMoney(${idx})">+ Начислить</button>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-function renderPresident() {
-  const accs = load();
-  const notis = loadNotis();
-  const list = document.getElementById('pres-list');
-  const notiList = document.getElementById('pres-notifications');
-  const query = document.getElementById('pres-search').value.toLowerCase().trim();
-  
-  if (notiList) {
-    notiList.innerHTML = '';
-    if (notis.length === 0) {
-      notiList.innerHTML = '<p class="sub" style="margin:0; text-align:left;">Нет новых запросов</p>';
-    }
-    notis.forEach(n => {
-      const div = document.createElement('div');
-      div.className = 'noti-item';
-      div.innerHTML = `
-        <div style="font-size:14px; margin-bottom: 6px;"><b>${n.from}</b> требует премию <b>${n.amount} GC</b></div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn small green" onclick="approveBonus(${n.id})">Одобрить</button>
-          <button class="btn small red" onclick="rejectBonus(${n.id})">Отклонить</button>
-        </div>
-      `;
-      notiList.appendChild(div);
-    });
+  if (!currentNick || !activeCardNum) { showMsg('tr-msg', 'Выберите активную карту!', 'err'); return; }
+  const toNum = document.getElementById('tr-card-to').value.trim();
+  const amt = parseFloat(document.getElementById('tr-amount').value);
+  const cmt = document.getElementById('tr-comment').value.trim();
+  if (!toNum || isNaN(amt) || amt <= 0) { showMsg('tr-msg', 'Укажите карту получателя и сумму!', 'err'); return; }
+  const cards = loadCards(), accs = load();
+  const fromCard = cards.find(c => c.num.toLowerCase() === activeCardNum.toLowerCase());
+  const toCard = cards.find(c => c.num.toLowerCase() === toNum.toLowerCase());
+  if (!fromCard || isCardBlocked(fromCard)) { showMsg('tr-msg', 'Ваша карта заблокирована!', 'err'); return; }
+  if (!toCard || fromCard === toCard) { showMsg('tr-msg', 'Карта получателя не найдена!', 'err'); return; }
+  if (fromCard.balance < amt) { showMsg('tr-msg', 'Недостаточно средств на карте!', 'err'); return; }
+  fromCard.balance = parseFloat((fromCard.balance - amt).toFixed(2));
+  toCard.balance = parseFloat((toCard.balance + amt).toFixed(2));
+  if (toCard.num.toLowerCase() === 'кликкер') {
+    const me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+    if (me) { me.clickerPaid = parseFloat(((me.clickerPaid || 0) + amt).toFixed(2)); save(accs); }
   }
+  addCardTx(fromCard, 'minus', amt, `перевод на ${toCard.num}`, cmt);
+  addCardTx(toCard, 'plus', amt, `перевод с ${fromCard.num}`, cmt);
+  saveCards(cards); renderMyBank();
+  document.getElementById('tr-card-to').value = ''; document.getElementById('tr-amount').value = ''; document.getElementById('tr-comment').value = '';
+  showMsg('tr-msg', 'Перевод выполнен!', 'ok');
+}
 
-  if (!list) return;
-  list.innerHTML = '';
-  accs.forEach((a, idx) => {
-    if (query && !a.nick.toLowerCase().includes(query)) return;
+function createInvoice() {
+  if (!currentNick) return;
+  const toCard = document.getElementById('inv-to-card').value.trim();
+  const amt = parseFloat(document.getElementById('inv-amount').value);
+  const rsn = document.getElementById('inv-reason').value.trim();
+  if (!toCard || isNaN(amt) || amt <= 0 || !rsn) { showMsg('inv-msg', 'Заполните карту, сумму и причину!', 'err'); return; }
+  const target = loadCards().find(c => !c.isGov && c.num.toLowerCase() === toCard.toLowerCase());
+  if (!target) { showMsg('inv-msg', 'Карта получателя не найдена!', 'err'); return; }
+  const invs = loadInvoices();
+  invs.unshift({ id: Date.now(), from: currentNick, fromCard: activeCardNum || '', toCard: target.num, amount: parseFloat(amt.toFixed(2)), reason: rsn, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  saveInvoices(invs);
+  if (target.ownerNick) pushAccNoti(target.ownerNick, `🧾 Вам выставлен счёт на ${amt} GC от ${currentNick} (${rsn})`);
+  document.getElementById('inv-to-card').value = ''; document.getElementById('inv-amount').value = ''; document.getElementById('inv-reason').value = '';
+  showMsg('inv-msg', `Счёт на ${amt} GC отправлен!`, 'ok');
+}
 
-    const div = document.createElement('div');
-    div.className = 'acct';
-    
-    const blocked = isAccountBlocked(a);
-    let blockStatusHtml = blocked ? 
-      `<div class="msg err" style="margin:4px 0;">Заблокирован! Осталось: ${getRemainingBlockedHours(a)} ч.</div>
-       <button class="btn small green" style="width:100%;margin-top:6px;" onclick="unblockAccount(${idx})">🔓 Разблокировать сейчас</button>` :
-      `<div class="row">
-         <input type="number" id="block-time-${idx}" min="1" placeholder="Срок (в часах)">
-         <button class="btn small red" onclick="blockAccount(${idx})">⛔ Забанить</button>
-       </div>`;
+function payInvoice(id) {
+  let invs = loadInvoices(); const inv = invs.find(x => x.id === id); if (!inv) return;
+  const cards = loadCards();
+  const payerCard = cards.find(c => c.num.toLowerCase() === inv.toCard.toLowerCase());
+  const recvCard = cards.find(c => c.num.toLowerCase() === (inv.fromCard || '').toLowerCase()) || cards.find(c => (c.ownerNick || '').toLowerCase() === inv.from.toLowerCase());
+  if (!payerCard || isCardBlocked(payerCard) || payerCard.balance < inv.amount) { alert('Недостаточно средств на карте или она заблокирована!'); return; }
+  payerCard.balance = parseFloat((payerCard.balance - inv.amount).toFixed(2));
+  addCardTx(payerCard, 'minus', inv.amount, `оплата счёта (${inv.from})`, inv.reason);
+  if (recvCard) { recvCard.balance = parseFloat((recvCard.balance + inv.amount).toFixed(2)); addCardTx(recvCard, 'plus', inv.amount, `оплата счёта от ${currentNick}`, inv.reason); }
+  saveCards(cards); saveInvoices(invs.filter(x => x.id !== id)); renderMyBank();
+}
+function declineInvoice(id) { if (confirm('Отклонить счёт?')) { saveInvoices(loadInvoices().filter(x => x.id !== id)); renderMyBank(); } }
 
-    const pText = a.salary ? { second:'сек', minute:'мин', hour:'час', day:'день', week:'нед', year:'год' }[a.salaryPeriod] : 'не настроена';
-    const currentSalStr = a.salary ? `${a.salary} GC / ${pText}` : 'Нет';
+function openCasinoWheel() {
+  if (!currentNick) { alert('Сначала войдите в «👤 Мой аккаунт»!'); showScreen('acc-login'); return; }
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (acc && (acc.age ?? 18) < 18) { alert('🎰 Вход в Казино разрешён только с 18 лет!'); return; }
+  showScreen('casino-wheel');
+  const card = loadCards().find(c => c.num === activeCardNum);
+  document.getElementById('casino-wheel-bal').textContent = card ? `Активная карта: ${card.num} (${parseFloat(card.balance.toFixed(2))} GC)` : 'Привяжите карту в аккаунте!';
+}
 
-    div.innerHTML = `
-      <div class="name">👑 Пользователь: ${a.nick}</div>
-      <div class="bal">Баланс: ${parseFloat(a.balance.toFixed(2))} GC</div>
-      <div class="salary-info" style="margin-bottom:8px;">Текущая зарплата: <b>${currentSalStr}</b></div>
-      
-      <div class="row" style="margin-bottom:10px;">
-        <input type="number" id="sal-amount-${idx}" step="0.01" placeholder="Размер з/п">
-        <select id="sal-period-${idx}">
-          <option value="second">Каждую секунду</option>
-          <option value="minute">Каждую минуту</option>
-          <option value="hour" selected>Каждый час</option>
-          <option value="day">Каждый день</option>
-          <option value="week">Каждую неделю</option>
-          <option value="year">Каждый год</option>
-        </select>
-        <button class="btn small green" onclick="setSalary(${idx})">💰 Назначить</button>
-      </div>
-      ${blockStatusHtml}
-    `;
-    list.appendChild(div);
+function spinCasinoWheel() {
+  if (wheelSpinning || !currentNick) return;
+  const bet = parseFloat(document.getElementById('casino-bet-amount').value);
+  if (isNaN(bet) || bet <= 0) { showMsg('casino-wheel-msg', 'Введите корректную ставку!', 'err'); return; }
+  const cards = loadCards();
+  const playerCard = cards.find(c => c.num === activeCardNum);
+  const casinoCard = cards.find(c => c.num.toLowerCase() === 'казино');
+  if (!playerCard || isCardBlocked(playerCard)) { showMsg('casino-wheel-msg', 'Нет активной рабочей карты!', 'err'); return; }
+  if (playerCard.balance < bet) { showMsg('casino-wheel-msg', 'Недостаточно GC на карте!', 'err'); return; }
+
+  playerCard.balance = parseFloat((playerCard.balance - bet).toFixed(2));
+  casinoCard.balance = parseFloat((casinoCard.balance + bet).toFixed(2));
+  addCardTx(playerCard, 'minus', bet, 'ставка в Казино');
+  addCardTx(casinoCard, 'plus', bet, `ставка от ${currentNick}`);
+  saveCards(cards);
+
+  wheelSpinning = true;
+  const sector = Math.floor(Math.random() * 10); // 0 = x2 (36 deg), 1..9 = 0
+  const targetDeg = sector === 0 ? 342 : (360 - (sector * 36 + 18));
+  wheelAngle += 1800 + targetDeg - (wheelAngle % 360);
+  const disc = document.getElementById('casino-wheel-disc');
+  disc.style.transform = `rotate(${wheelAngle}deg)`;
+
+  setTimeout(() => {
+    wheelSpinning = false;
+    const freshCards = loadCards();
+    const pCard = freshCards.find(c => c.num === activeCardNum);
+    const cCard = freshCards.find(c => c.num.toLowerCase() === 'казино');
+    if (sector === 0) {
+      const win = parseFloat((bet * 2).toFixed(2));
+      cCard.balance = parseFloat((cCard.balance - win).toFixed(2));
+      pCard.balance = parseFloat((pCard.balance + win).toFixed(2));
+      addCardTx(cCard, 'minus', win, `выигрыш x2 (${currentNick})`);
+      addCardTx(pCard, 'plus', win, 'выигрыш x2 в Казино!');
+      saveCards(freshCards);
+      showMsg('casino-wheel-msg', `🎉 ВЫПАЛО x2! Вы выиграли ${win} GC!`, 'ok');
+    } else {
+      showMsg('casino-wheel-msg', `😢 Выпал сектор 0. Вы проиграли ${bet} GC.`, 'err');
+    }
+    document.getElementById('casino-wheel-bal').textContent = `Активная карта: ${pCard.num} (${parseFloat(pCard.balance.toFixed(2))} GC)`;
+  }, 3300);
+}
+
+function openCityServices() {
+  if (!currentNick) { alert('Сначала войдите в «👤 Мой аккаунт»!'); showScreen('acc-login'); return; }
+  showScreen('city-services');
+}
+
+function renderCityServices() {
+  if (!currentNick) return;
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  const age = acc.age ?? 18;
+  document.getElementById('services-age-info').innerHTML = `Ваш возраст: <b>${age} лет</b> • Здоровье: <b>${acc.hp ?? 100} HP</b>`;
+  let html = '';
+  if (age < 18) html += `<div class="acct"><div class="name">🏫 Школа (до 18 лет)</div><div class="pw">Вам доступно школьное обучение</div><button class="btn small edu" style="width:100%; margin-top:6px;" onclick="visitEdu('Школе')">Посетить урок в Школе</button></div>`;
+  if (age >= 15) html += `<div class="acct"><div class="name">📚 Колледж (с 15 лет)</div><button class="btn small edu" style="width:100%; margin-top:6px;" onclick="visitEdu('Колледже')">Посетить пару в Колледже</button></div>`;
+  if (age >= 17) html += `<div class="acct"><div class="name">🎓 Университет (с 17 лет)</div><button class="btn small edu" style="width:100%; margin-top:6px;" onclick="visitEdu('Университете')">Посетить лекцию в Универе</button></div>`;
+  if (age >= 18) {
+    html += `<div class="acct"><div class="name">⚔️ Контракт на Войну (18+)</div><div class="pw">После подписания освободить может только Президент!</div>
+      ${acc.warContract ? '<div class="msg err">Вы уже служите по контракту!</div>' : '<button class="btn small war" style="width:100%; margin-top:6px;" onclick="signWarContract()">Подписать контракт на Войну</button>'}</div>`;
+  }
+  html += `<div class="acct"><div class="name">🏥 Лечение в Больнице (50 GC → 100 HP)</div><button class="btn small hospital" style="width:100%; margin-top:6px;" onclick="buyHospitalHeal()">Вылечиться в Больнице</button></div>`;
+  document.getElementById('services-adaptive-list').innerHTML = html;
+}
+function startStreetFight() {
+  if (!currentNick) return;
+  const targetNick = document.getElementById('fight-target-nick').value.trim();
+  if (!targetNick) { showMsg('services-msg', 'Введите ник соперника!', 'err'); return; }
+  const accs = load();
+  const me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  const opp = accs.find(a => a.nick.toLowerCase() === targetNick.toLowerCase());
+  if (!opp || opp === me) { showMsg('services-msg', 'Соперник не найден!', 'err'); return; }
+  me.hp = Math.max(0, (me.hp ?? 100) - 25);
+  opp.hp = Math.max(0, (opp.hp ?? 100) - 25);
+  save(accs);
+  pushAccNoti(opp.nick, `🥊 Гражданин ${me.nick} подрался с вами! Вы потеряли -25 HP (осталось ${opp.hp} HP).`);
+  document.getElementById('fight-target-nick').value = '';
+  showMsg('services-msg', `🥊 Драка с ${opp.nick}! Обоим снято -25 HP.`, 'ok');
+  refreshActiveScreens();
+}
+
+function sendPoliceReport() {
+  if (!currentNick) return;
+  const suspect = document.getElementById('rep-suspect-nick').value.trim(), reason = document.getElementById('rep-reason').value.trim();
+  if (!suspect || !reason) { showMsg('services-msg', 'Укажите нарушителя и суть заявления!', 'err'); return; }
+  const reps = loadPoliceReports();
+  reps.unshift({ id: Date.now(), from: currentNick, suspect, reason, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  savePoliceReports(reps);
+  document.getElementById('rep-suspect-nick').value = ''; document.getElementById('rep-reason').value = '';
+  showMsg('services-msg', '🚓 Заявление передано в Полицию!', 'ok');
+}
+
+function visitEdu(place) { showMsg('services-msg', `📖 Вы успешно прошли занятие в ${place}!`, 'ok'); }
+
+function signWarContract() {
+  if (!currentNick || !confirm('Подписать контракт на Войну? Освободить вас сможет только Президент!')) return;
+  const accs = load(), me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (me) { me.warContract = true; me.job = 'war'; save(accs); renderCityServices(); showMsg('services-msg', '⚔️ Контракт подписан! Вы зачислены на Войну.', 'ok'); }
+}
+
+function buyHospitalHeal() {
+  if (!currentNick) return;
+  const accs = load(), cards = loadCards();
+  const me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  const myCard = cards.find(c => c.num === activeCardNum), hospCard = cards.find(c => c.num.toLowerCase() === 'больница');
+  if (!myCard || myCard.balance < 50) { showMsg('services-msg', 'Нужна карта с балансом от 50 GC!', 'err'); return; }
+  myCard.balance = parseFloat((myCard.balance - 50).toFixed(2)); hospCard.balance = parseFloat((hospCard.balance + 50).toFixed(2));
+  addCardTx(myCard, 'minus', 50, 'лечение в Больнице'); addCardTx(hospCard, 'plus', 50, `лечение (${me.nick})`);
+  me.hp = 100; save(accs); saveCards(cards); renderCityServices();
+  showMsg('services-msg', '🏥 Вы полностью вылечены (100 HP)!', 'ok');
+}
+
+function openOgurchikViewer() { showScreen('ogurchik-viewer'); }
+function renderOgurchikViewer() {
+  const stage = document.getElementById('ogurchik-viewer-stage'); if (!stage) return;
+  const st = loadClubState();
+  if (!st.activeDancer) {
+    stage.innerHTML = `<div class="pole-stage"><div class="pole-rod"></div></div><p class="sub">Сейчас на сцене пустой шест — танцовщица ещё не вышла на смену.</p>`;
+  } else {
+    const cls = st.spinDir === 'left' ? 'dancer-left' : (st.spinDir === 'right' ? 'dancer-right' : '');
+    const dirText = st.spinDir === 'left' ? 'крутится влево' : (st.spinDir === 'right' ? 'крутится вправо' : 'стоит у шеста');
+    stage.innerHTML = `<div class="pole-stage"><div class="pole-rod"></div><div class="dancer-avatar ${cls}">💃</div></div><p class="sub" style="color:#f0abfc;">На сцене: <b>${st.activeDancer}</b> (${dirText})</p>`;
+  }
+}
+
+function setClubSpin(dir) {
+  if (!activeJobNick) return;
+  saveClubState({ activeDancer: activeJobNick, spinDir: dir });
+  const el = document.getElementById('ogurchik-work-dancer');
+  if (el) el.className = 'dancer-avatar ' + (dir === 'left' ? 'dancer-left' : (dir === 'right' ? 'dancer-right' : ''));
+}
+
+function ogurchikLogout() {
+  const st = loadClubState();
+  if (st.activeDancer && activeJobNick && st.activeDancer.toLowerCase() === activeJobNick.toLowerCase()) {
+    saveClubState({ activeDancer: null, spinDir: 'idle' });
+  }
+  jobLogout();
+}
+function openJobGate(dept) {
+  pendingJobDept = dept;
+  document.getElementById('job-login-title').textContent = 'Вход: ' + getJobLabel(dept);
+  if (currentNick) { quickEnterJob(dept); return; }
+  showScreen('job-login');
+}
+
+function enterWorkSuccess(acc, dept) {
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === acc.nick.toLowerCase());
+  target.hp = Math.max(0, (target.hp ?? 100) - 5);
+  target.workWidget = getJobLabel(target.job);
+  save(accs);
+  activeJobNick = target.nick;
+  if (dept === 'ogurchik') saveClubState({ activeDancer: target.nick, spinDir: 'idle' });
+  showScreen(dept);
+}
+
+function quickEnterJob(dept) {
+  const acc = load().find(a => a.nick.toLowerCase() === (currentNick || '').toLowerCase());
+  if (!acc || !acc.job || !acc.job.startsWith(dept)) { alert('Вы не устроены на эту работу!'); return; }
+  if (acc.exiled || (acc.hp ?? 100) <= 0) { alert('Вход недоступен!'); return; }
+  enterWorkSuccess(acc, dept);
+}
+
+function submitJobLogin() {
+  const nick = document.getElementById('job-login-nick').value.trim(), pass = document.getElementById('job-login-pass').value;
+  const acc = load().find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (!acc) { showMsg('job-login-msg', 'Неверный ник или пароль!', 'err'); return; }
+  if (acc.exiled || (acc.hp ?? 100) <= 0) { showMsg('job-login-msg', 'Доступ запрещён!', 'err'); return; }
+  if (!acc.job || !acc.job.startsWith(pendingJobDept)) { showMsg('job-login-msg', 'Вы не назначены на эту работу!', 'err'); return; }
+  document.getElementById('job-login-nick').value = ''; document.getElementById('job-login-pass').value = '';
+  enterWorkSuccess(acc, pendingJobDept);
+}
+function jobLogout() { activeJobNick = null; showScreen('home'); }
+
+function publishGavishaPost() {
+  const title = document.getElementById('gav-post-title').value.trim(), text = document.getElementById('gav-post-text').value.trim();
+  if (!title || !text) { showMsg('gav-post-msg', 'Заполните заголовок и текст!', 'err'); return; }
+  const posts = loadGavisha();
+  posts.unshift({ id: Date.now(), author: activeJobNick || 'Редакция', title, text, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString() });
+  saveGavisha(posts);
+  document.getElementById('gav-post-title').value = ''; document.getElementById('gav-post-text').value = '';
+  showMsg('gav-post-msg', 'Опубликовано в Гавише!', 'ok'); renderGavisha();
+}
+function deleteGavishaPost(id) { saveGavisha(loadGavisha().filter(p => p.id !== id)); renderGavisha(); }
+function renderGavishaPublic() {
+  const list = document.getElementById('gavisha-public-list'); if (!list) return;
+  const posts = loadGavisha();
+  list.innerHTML = posts.length === 0 ? '<p class="sub">В Гавише пока нет объявлений</p>' : posts.map(p => `<div class="acct"><div class="name">📰 ${p.title}</div><div style="font-size:13px; margin:6px 0;">${p.text}</div><div class="tx-date">Автор: ${p.author} • ${p.date}</div></div>`).join('');
+}
+
+function publishBnsItem() {
+  const title = document.getElementById('bns-item-title').value.trim(), price = parseFloat(document.getElementById('bns-item-price').value), qty = parseInt(document.getElementById('bns-item-qty').value);
+  if (!title || isNaN(price) || price <= 0 || isNaN(qty) || qty < 1) { showMsg('bns-pub-msg', 'Заполните название, цену и количество!', 'err'); return; }
+  const items = loadBns();
+  items.unshift({ id: Date.now(), title, price: parseFloat(price.toFixed(2)), qty });
+  saveBns(items);
+  document.getElementById('bns-item-title').value = ''; document.getElementById('bns-item-price').value = ''; document.getElementById('bns-item-qty').value = '';
+  showMsg('bns-pub-msg', 'Техника добавлена в БНС!', 'ok'); renderBns();
+}
+function buyBnsItem(id) {
+  if (!currentNick || !activeCardNum) { showMsg('bns-store-msg', 'Сначала войдите в аккаунт и привяжите карту!', 'err'); return; }
+  const items = loadBns(), item = items.find(i => i.id === id);
+  if (!item || item.qty <= 0) return;
+  const cards = loadCards(), pCard = cards.find(c => c.num === activeCardNum), bnsCard = cards.find(c => c.num.toLowerCase() === 'бнс');
+  if (!pCard || pCard.balance < item.price) { showMsg('bns-store-msg', 'Недостаточно GC на карте!', 'err'); return; }
+  pCard.balance = parseFloat((pCard.balance - item.price).toFixed(2)); bnsCard.balance = parseFloat((bnsCard.balance + item.price).toFixed(2));
+  addCardTx(pCard, 'minus', item.price, `покупка в БНС: ${item.title}`); addCardTx(bnsCard, 'plus', item.price, `продажа (${currentNick}): ${item.title}`);
+  item.qty -= 1; saveCards(cards); saveBns(items.filter(i => i.qty > 0)); renderBnsStore();
+  showMsg('bns-store-msg', `🔌 Вы купили «${item.title}» за ${item.price} GC!`, 'ok');
+}
+function renderBnsStore() {
+  const list = document.getElementById('bns-store-list'); if (!list) return;
+  const items = loadBns();
+  list.innerHTML = items.length === 0 ? '<p class="sub">В БНС пока нет товаров</p>' : items.map(i => `<div class="acct"><div class="name">🔌 ${i.title}</div><div class="bal">${i.price} GC • В наличии: ${i.qty} шт.</div><button class="btn small bns" style="width:100%; margin-top:6px;" onclick="buyBnsItem(${i.id})">Купить</button></div>`).join('');
+}
+
+function checkClickerAccess() {
+  if (!currentNick) { showMsg('clk-msg', 'Сначала войдите в «👤 Мой аккаунт»!', 'err'); return; }
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  const paid = acc ? (acc.clickerPaid || 0) : 0;
+  document.getElementById('clk-progress-text').textContent = `Внесено ${parseFloat(paid.toFixed(2))} GC из ${CLICKER_GOAL} GC`;
+  document.getElementById('clk-progress-bar').style.width = Math.min(100, (paid / CLICKER_GOAL) * 100) + '%';
+  if (paid >= CLICKER_GOAL) { showScreen('clicker-game'); updateClickerScreen(); }
+  else showMsg('clk-msg', 'Переведите недостающую сумму на счёт кликкер в «Моём банке»!', 'err');
+}
+function updateClickerScreen() {
+  if (!currentNick || document.getElementById('screen-clicker-game').classList.contains('hidden')) return;
+  const card = loadCards().find(c => c.num === activeCardNum);
+  document.getElementById('clk-game-title').textContent = '🪙 Кликер: ' + currentNick;
+  document.getElementById('clk-game-bal').textContent = card ? parseFloat(card.balance.toFixed(2)) + ' GC' : '0 GC';
+}
+function doCoinClick() {
+  if (!currentNick || !activeCardNum) return;
+  const cards = loadCards(), card = cards.find(c => c.num === activeCardNum);
+  if (card) { card.balance = parseFloat((card.balance + 1).toFixed(2)); saveCards(cards); updateClickerScreen(); }
+}
+function exitClicker() { showScreen('home'); }
+function openTransactions() { viewingTxCard = activeCardNum; txReturnScreen = 'my-bank'; showScreen('transactions'); }
+function openBankTransactions(num) { viewingTxCard = num; txReturnScreen = 'bank'; showScreen('transactions'); }
+function closeTransactionsScreen() { viewingTxCard = null; showScreen(txReturnScreen || 'my-bank'); }
+
+function showTxComment(idx) {
+  const card = loadCards().find(c => c.num.toLowerCase() === (viewingTxCard || '').toLowerCase());
+  if (!card || !card.transactions || !card.transactions[idx]) return;
+  const tx = card.transactions[idx];
+  document.getElementById('modal-tx-meta').textContent = `${tx.type === 'plus' ? '+' : '-'}${tx.amount} GC ${tx.desc} • ${tx.date}`;
+  document.getElementById('modal-tx-text').textContent = tx.comment;
+  document.getElementById('comment-modal').classList.remove('hidden');
+}
+function closeCommentModal() { document.getElementById('comment-modal').classList.add('hidden'); }
+
+function renderTransactions() {
+  const card = loadCards().find(c => c.num.toLowerCase() === (viewingTxCard || '').toLowerCase());
+  const list = document.getElementById('tx-list'), titleEl = document.getElementById('tx-screen-title');
+  if (!list || !card) return;
+  if (titleEl) titleEl.textContent = `📜 Транзакции карты ${card.num}`;
+  const txs = card.transactions || [];
+  list.innerHTML = txs.length === 0 ? '<p class="sub" style="margin-top:20px;">Транзакций пока нет</p>' : txs.map((t, idx) => `<div class="tx-item">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="${t.type === 'plus' ? 'tx-plus' : 'tx-minus'}">${t.type === 'plus' ? '+' : '-'}${t.amount} GC ${t.desc}</div>
+      ${t.comment ? `<button class="btn tiny" onclick="showTxComment(${idx})">💬 Сообщение</button>` : ''}
+    </div><div class="tx-date">${t.date}</div></div>`).join('');
+}
+
+function openDevitoLogin(role) { devitoRole = role; document.getElementById('devito-login-title').textContent = role === 'buyer' ? '🛍 Вход для покупателя' : '🏪 Вход для продавца'; showScreen('devito-login'); }
+function devitoLogin() {
+  const nick = document.getElementById('dev-nick').value.trim(), pass = document.getElementById('dev-pass').value;
+  const acc = load().find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (!acc || acc.exiled || (acc.hp ?? 100) <= 0) { showMsg('dev-login-msg', 'Неверные данные или доступ закрыт!', 'err'); return; }
+  document.getElementById('dev-nick').value = ''; document.getElementById('dev-pass').value = '';
+  devitoNick = acc.nick; showScreen(devitoRole === 'buyer' ? 'devito-buyer' : 'devito-seller');
+}
+function devitoLogout() { devitoNick = null; activeOrderId = null; showScreen('home'); }
+
+function compressImage(file, cb) {
+  const r = new FileReader();
+  r.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'); let w = img.width, h = img.height, m = 480;
+      if (w > h && w > m) { h = Math.round(h * m / w); w = m; } else if (h > m) { w = Math.round(w * m / h); h = m; }
+      c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); cb(c.toDataURL('image/jpeg', 0.72));
+    }; img.src = e.target.result;
+  }; r.readAsDataURL(file);
+}
+function getEffectivePrice(i) { const d = i.discount || 0; return d <= 0 ? i.price : parseFloat((i.price * (1 - d / 100)).toFixed(2)); }
+
+function publishDevitoItem() {
+  if (!devitoNick) return;
+  const f = document.getElementById('dev-item-photo'), t = document.getElementById('dev-item-title').value.trim(), p = parseFloat(document.getElementById('dev-item-price').value), q = parseInt(document.getElementById('dev-item-qty').value), a = document.getElementById('dev-item-addr').value.trim();
+  if (!f.files || !f.files || !t || isNaN(p) || p <= 0 || isNaN(q) || q < 1 || !a) { showMsg('dev-pub-msg', 'Заполните все поля и фото!', 'err'); return; }
+  compressImage(f.files, b64 => {
+    const items = loadDevitoItems(); items.unshift({ id: Date.now(), seller: devitoNick, title: t, price: parseFloat(p.toFixed(2)), qty: q, discount: 0, addr: a, photo: b64 });
+    saveDevitoItems(items); f.value = ''; document.getElementById('dev-item-title').value = ''; document.getElementById('dev-item-price').value = ''; document.getElementById('dev-item-qty').value = ''; document.getElementById('dev-item-addr').value = '';
+    showMsg('dev-pub-msg', 'Опубликовано!', 'ok'); renderDevitoSeller();
   });
+}
+function setDevitoDiscount(id) {
+  const d = parseInt(document.getElementById(`disc-input-${id}`).value); if (isNaN(d) || d < 0 || d > 99) return;
+  const items = loadDevitoItems(), it = items.find(x => x.id === id); if (it) { it.discount = d; saveDevitoItems(items); renderDevitoSeller(); }
+}
+function deleteDevitoItem(id) { if (confirm('Удалить?')) { saveDevitoItems(loadDevitoItems().filter(x => x.id !== id)); renderDevitoSeller(); } }
+function withdrawDevitoBalance() {
+  if (!devitoNick) return;
+  const accs = load(), cards = loadCards(), acc = accs.find(a => a.nick.toLowerCase() === devitoNick.toLowerCase());
+  const card = cards.find(c => (c.ownerNick || '').toLowerCase() === devitoNick.toLowerCase());
+  if (!acc || (acc.devitoBalance || 0) < 1000 || !card) { showMsg('dev-withdraw-msg', 'Минимум 1000 GC и нужна привязанная карта!', 'err'); return; }
+  const sum = acc.devitoBalance; card.balance = parseFloat((card.balance + sum).toFixed(2)); acc.devitoBalance = 0;
+  addCardTx(card, 'plus', sum, 'вывод с Девито'); save(accs); saveCards(cards); renderDevitoSeller();
+  showMsg('dev-withdraw-msg', `Выведено ${sum} GC на карту ${card.num}!`, 'ok');
+}
+function renderSimpleOrg(dept, govNick, title, btnCls, fnName) {
+  renderDirectorPanel(dept, `${dept}-director-box`, dept === 'casino' ? ['casino', 'casino_cashier'] : [dept]);
+  renderOrgBox(`${dept}-account-box`, govNick, title, btnCls, fnName);
+  const list = document.getElementById(`${dept}-staff-list`);
+  if (list) list.innerHTML = load().filter(a => a.job && a.job.startsWith(dept)).map(a => `<div class="acct"><div class="name">${formatNick(a)} — ${getJobLabel(a.job)}</div></div>`).join('') || '<p class="sub">Сотрудников нет</p>';
+}
+function schoolTransfer() { govBoxTransfer('школа', 'школа-tr-to', 'школа-tr-amt', 'школа-tr-cmt', 'школа-tr-msg', 'Школа', renderSchool); }
+function renderSchool() { renderSimpleOrg('school', 'школа', '🏫 Счёт: школа', 'edu', 'schoolTransfer'); }
+function univTransfer() { govBoxTransfer('универ', 'универ-tr-to', 'универ-tr-amt', 'универ-tr-cmt', 'универ-tr-msg', 'Университет', renderUniv); }
+function renderUniv() { renderSimpleOrg('univ', 'универ', '🎓 Счёт: универ', 'edu', 'univTransfer'); }
+function collegeTransfer() { govBoxTransfer('колледж', 'колледж-tr-to', 'колледж-tr-amt', 'колледж-tr-cmt', 'колледж-tr-msg', 'Колледж', renderCollege); }
+function renderCollege() { renderSimpleOrg('college', 'колледж', '📚 Счёт: колледж', 'edu', 'collegeTransfer'); }
+function armyTransfer() { govBoxTransfer('армия', 'армия-tr-to', 'армия-tr-amt', 'армия-tr-cmt', 'армия-tr-msg', 'Армия', renderArmy); }
+function renderArmy() { renderSimpleOrg('army', 'армия', '🪖 Счёт: армия', 'army', 'armyTransfer'); }
+function warTransfer() { govBoxTransfer('война', 'война-tr-to', 'война-tr-amt', 'война-tr-cmt', 'война-tr-msg', 'Война', renderWar); }
+function renderWar() { renderSimpleOrg('war', 'война', '⚔️ Счёт: война', 'war', 'warTransfer'); }
+function casinoTransfer() { govBoxTransfer('казино', 'казино-tr-to', 'казино-tr-amt', 'казино-tr-cmt', 'казино-tr-msg', 'Казино', renderCasino); }
+function renderCasino() { renderSimpleOrg('casino', 'казино', '🎰 Счёт: казино', 'casino', 'casinoTransfer'); }
+function holidayTransfer() { govBoxTransfer('праздники', 'праздники-tr-to', 'праздники-tr-amt', 'праздники-tr-cmt', 'праздники-tr-msg', 'Праздники', renderHoliday); }
+function renderHoliday() { renderSimpleOrg('holiday', 'праздники', '🎉 Счёт: праздники', 'holiday', 'holidayTransfer'); }
+function mintTransfer() { govBoxTransfer('мастерская', 'мастерская-tr-to', 'мастерская-tr-amt', 'мастерская-tr-cmt', 'мастерская-tr-msg', 'Чинка монет', renderMint); }
+function renderMint() { renderSimpleOrg('mint', 'мастерская', '🪙 Счёт: мастерская', 'mint', 'mintTransfer'); }
+function ogurchikTransfer() { govBoxTransfer('огурчик', 'огурчик-tr-to', 'огурчик-tr-amt', 'огурчик-tr-cmt', 'огурчик-tr-msg', 'Клуб «Огурчик»', renderOgurchik); }
+function renderOgurchik() { renderSimpleOrg('ogurchik', 'огурчик', '🥒 Счёт: огурчик', 'ogurchik', 'ogurchikTransfer'); }
+function janitorTransfer() { govBoxTransfer('дворники', 'дворники-tr-to', 'дворники-tr-amt', 'дворники-tr-cmt', 'дворники-tr-msg', 'Дворники', renderJanitor); }
+function renderJanitor() { renderSimpleOrg('janitor', 'дворники', '🧹 Счёт: дворники', 'gray', 'janitorTransfer'); }
+
+function setFootballPrice(idx) {
+  const val = parseFloat(document.getElementById(`fb-p-${idx}`).value); if (isNaN(val) || val < 0) return;
+  const a = load(); a[idx].footballPrice = parseFloat(val.toFixed(2)); save(a); renderFootball();
+}
+function renderFootball() {
+  renderDirectorPanel('football', 'football-director-box', ['football']);
+  const accs = load(), me = accs.find(a => a.nick.toLowerCase() === (activeJobNick || '').toLowerCase());
+  const isBoss = me && (me.job === 'football_dir' || me.job === 'football_dep');
+  document.getElementById('football-list').innerHTML = accs.map((a, idx) => (!a.job || !a.job.startsWith('football')) ? '' : `<div class="acct">
+    <div class="name">⚽ ${formatNick(a)} <span class="badge-job">${getJobLabel(a.job)}</span></div>
+    <div class="bal">Трансферная цена: <b>${a.footballPrice || 0} GC</b></div>
+    ${isBoss ? `<div class="row"><input type="number" id="fb-p-${idx}" placeholder="Цена (GC)"><button class="btn small football" onclick="setFootballPrice(${idx})">Установить</button></div>` : ''}</div>`).join('') || '<p class="sub">Игроков нет</p>';
+}
+function gavishaTransfer() { govBoxTransfer('гавиша', 'гавиша-tr-to', 'гавиша-tr-amt', 'гавиша-tr-cmt', 'гавиша-tr-msg', 'Гавиша', renderGavisha); }
+function renderGavisha() {
+  renderDirectorPanel('gavisha', 'gavisha-director-box', ['gavisha']);
+  renderOrgBox('gavisha-account-box', 'гавиша', '📰 Счёт: гавиша', 'gavisha', 'gavishaTransfer');
+  document.getElementById('gavisha-staff-posts').innerHTML = loadGavisha().map(p => `<div class="acct"><div style="display:flex; justify-content:space-between;"><span class="name">${p.title}</span><button class="del" onclick="deleteGavishaPost(${p.id})">×</button></div><div class="pw">${p.text}</div></div>`).join('');
+}
+function bnsTransfer() { govBoxTransfer('бнс', 'бнс-tr-to', 'бнс-tr-amt', 'бнс-tr-cmt', 'бнс-tr-msg', 'БНС', renderBns); }
+function renderBns() {
+  renderDirectorPanel('bns', 'bns-director-box', ['bns']);
+  renderOrgBox('bns-account-box', 'бнс', '🔌 Счёт: бнс', 'bns', 'bnsTransfer');
+  document.getElementById('bns-staff-items').innerHTML = loadBns().map(i => `<div class="acct"><div class="name">🔌 ${i.title} — ${i.price} GC (${i.qty} шт.)</div></div>`).join('');
+}
+
+function killerTransfer() { govBoxTransfer('киллеры', 'киллеры-tr-to', 'киллеры-tr-amt', 'киллеры-tr-cmt', 'киллеры-tr-msg', 'Киллеры', renderKiller); }
+function executeKillerHit(idx) {
+  const accs = load(); if (!accs[idx]) return;
+  accs[idx].hp = Math.max(0, (accs[idx].hp ?? 100) - 75);
+  save(accs); pushAccNoti(accs[idx].nick, `🎯 На вас совершено покушение! Потеряно -75 HP (осталось ${accs[idx].hp} HP).`);
+  renderKiller(); showMsg('killer-action-msg', `Контракт выполнен! Цели снято -75 HP.`, 'ok');
+}
+function renderKiller() {
+  renderDirectorPanel('killer', 'killer-director-box', ['killer']);
+  renderOrgBox('killer-account-box', 'киллеры', '🎯 Счёт: киллеры', 'darkops', 'killerTransfer');
+  const q = document.getElementById('killer-search').value.toLowerCase().trim();
+  document.getElementById('killer-list').innerHTML = load().map((a, idx) => (q && !a.nick.toLowerCase().includes(q)) ? '' : `<div class="acct"><div class="name">🎯 ${formatNick(a)} (${a.hp ?? 100} HP)</div><button class="btn small red" style="width:100%; margin-top:6px;" onclick="executeKillerHit(${idx})">Выполнить контракт (-75 HP)</button></div>`).join('');
+}
+
+function tckTransfer() { govBoxTransfer('тцк', 'тцк-tr-to', 'тцк-tr-amt', 'тцк-tr-cmt', 'тцк-tr-msg', 'ТЦК', renderTck); }
+function sendTckDraft() {
+  const nick = document.getElementById('tck-target-nick').value.trim(), rsn = document.getElementById('tck-reason').value.trim();
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target) { showMsg('tck-draft-msg', 'Гражданин не найден!', 'err'); return; }
+  target.escapeCode = null; save(accs);
+  pushAccNoti(target.nick, `🪪 ПОВЕСТКА В АРМИЮ от ТЦК! ${rsn || 'Явитесь на призывной пункт.'}`, { isTck: true, tckHandled: false });
+  document.getElementById('tck-target-nick').value = ''; document.getElementById('tck-reason').value = '';
+  showMsg('tck-draft-msg', `Повестка отправлена гражданину ${target.nick}!`, 'ok'); renderTck();
+}
+function catchTckRunner(idx) {
+  const codeInp = document.getElementById(`tck-code-${idx}`).value.trim(), accs = load(), a = accs[idx];
+  if (!a || !a.escapeCode || codeInp !== a.escapeCode) { showMsg('tck-draft-msg', 'Неверный 4-значный код побега!', 'err'); return; }
+  a.escapeCode = null; a.armyUntil = Date.now() + 30 * 86400 * 1000; a.hp = Math.max(0, (a.hp ?? 100) - 25);
+  save(accs); pushAccNoti(a.nick, '🪪 Вы пойманы ТЦК и принудительно отправлены в Армию на 1 месяц (-25 HP)!');
+  renderTck(); showMsg('tck-draft-msg', `${a.nick} пойман и отправлен в Армию (-25 HP)!`, 'ok');
+}
+function renderTck() {
+  renderDirectorPanel('tck', 'tck-director-box', ['tck']);
+  renderOrgBox('tck-account-box', 'тцк', '🪪 Счёт: тцк', 'darkops', 'tckTransfer');
+  document.getElementById('tck-drafts-list').innerHTML = load().map((a, idx) => {
+    if (!a.escapeCode && !isInArmyService(a)) return '';
+    if (isInArmyService(a)) return `<div class="acct"><div class="name">🪖 ${formatNick(a)} — В Армии</div></div>`;
+    return `<div class="acct"><div class="name">🏃 Беглец: ${formatNick(a)}</div><div class="row" style="margin-top:6px;"><input id="tck-code-${idx}" placeholder="4-значный код"><button class="btn small red" onclick="catchTckRunner(${idx})">Поймать (-25 HP)</button></div></div>`;
+  }).join('') || '<p class="sub">Активных беглецов нет</p>';
+}
+
+function collectorTransfer() { govBoxTransfer('коллекторы', 'коллекторы-tr-to', 'коллекторы-tr-amt', 'коллекторы-tr-cmt', 'коллекторы-tr-msg', 'Коллекторы', renderCollector); }
+function renderCollector() {
+  renderDirectorPanel('collector', 'collector-director-box', ['collector']);
+  renderOrgBox('collector-account-box', 'коллекторы', '💼 Счёт: коллекторы', 'darkops', 'collectorTransfer');
+  const q = document.getElementById('collector-search').value.toLowerCase().trim();
+  document.getElementById('collector-list').innerHTML = loadCards().map((c, idx) => (c.isGov || (q && !c.num.toLowerCase().includes(q) && !(c.ownerNick || '').toLowerCase().includes(q))) ? '' : `<div class="acct"><div class="name">💼 ${c.num} (${c.ownerNick || '-'})</div><input id="col-r-${idx}" placeholder="Долг"><div class="row"><input type="number" id="col-a-${idx}" placeholder="Сумма"><button class="btn small red" onclick="issueCardFine(${idx},'col-a-${idx}','col-r-${idx}','collector-action-msg','взыскание Коллекторов',renderCollector)">Взыскать</button></div></div>`).join('');
+}
+
+function renderSupport() {
+  renderDirectorPanel('support', 'support-director-box', ['support']);
+  const t = loadSupportTickets();
+  document.getElementById('support-list').innerHTML = t.length === 0 ? '<p class="sub">Обращений нет</p>' : t.map(x => `<div class="acct"><div class="name">🎧 ${x.fromRole}: ${x.fromNick} (${x.resolved ? 'РЕШЕНО' : 'ОТКРЫТО'})</div><div class="pw">${x.itemTitle} (${x.price} GC) • «${x.reason}»</div>${x.resolved ? '' : `<button class="btn small green" style="width:100%; margin-top:4px;" onclick="resolveSupportTicket(${x.id},'buyer')">Вернуть покупателю</button><button class="btn small orange" style="width:100%; margin-top:4px;" onclick="resolveSupportTicket(${x.id},'seller')">Перевести продавцу</button>`}</div>`).join('');
+}
+function resolveSupportTicket(id, dec) {
+  const t = loadSupportTickets(), x = t.find(i => i.id === id); if (!x || x.resolved) return;
+  const orders = loadDevitoOrders(), o = orders.find(i => i.id === x.orderId), cards = loadCards(), accs = load();
+  if (o && (!o.status || o.status === 'pending')) {
+    if (dec === 'buyer') { const bc = cards.find(c => (c.ownerNick || '').toLowerCase() === x.buyer.toLowerCase()); if (bc) { bc.balance = parseFloat((bc.balance + x.price).toFixed(2)); saveCards(cards); } o.status = 'refunded'; }
+    if (dec === 'seller') { const sa = accs.find(a => a.nick.toLowerCase() === x.seller.toLowerCase()); if (sa) { sa.devitoBalance = parseFloat(((sa.devitoBalance || 0) + x.price).toFixed(2)); save(accs); } o.status = 'completed'; }
+    saveDevitoOrders(orders);
+  }
+  x.resolved = true; saveSupportTickets(t); renderSupport();
+}
+function cityTransfer() { govBoxTransfer('город', 'город-tr-to', 'город-tr-amt', 'город-tr-cmt', 'город-tr-msg', 'Государство (город)', renderPresident); }
+
+function buyCityUpgrade() {
+  const lvl = parseInt(localStorage.getItem(STORE_KEY + '_city_upgrade') || '0');
+  const cost = (lvl + 1) * 100;
+  const cards = loadCards(), cityCard = cards.find(c => c.num.toLowerCase() === 'город');
+  if (!cityCard) return;
+  cityCard.balance = parseFloat((cityCard.balance - cost).toFixed(2));
+  addCardTx(cityCard, 'minus', cost, `улучшение города (Уровень ${lvl + 1})`);
+  saveCards(cards);
+  localStorage.setItem(STORE_KEY + '_city_upgrade', String(lvl + 1));
+  if (typeof window.syncToCloud === 'function') window.syncToCloud();
+  renderPresident();
+}
+
+function setCitizenJob(idx) {
+  const val = document.getElementById(`job-sel-${idx}`).value, accs = load();
+  if (!accs[idx]) return;
+  if (val.startsWith('elder') && !accs[idx].isElderCouncil) { alert('В Суд Старейшин можно назначать только членов Совета Старейшин (добавляет Admin)!'); return; }
+  accs[idx].job = val; save(accs);
+  pushAccNoti(accs[idx].nick, `💼 Президент назначил вас на должность: ${getJobLabel(val)}`);
+  renderPresident();
+}
+
+function fireCitizenJob(idx) {
+  const accs = load();
+  if (!accs[idx] || !confirm(`Уволить ${accs[idx].nick} с должности?`)) return;
+  accs[idx].job = ''; save(accs);
+  pushAccNoti(accs[idx].nick, '❌ Президент уволил вас с должности.');
+  renderPresident();
+}
+
+function releaseArmyOrWar(idx) {
+  const accs = load(); if (!accs[idx]) return;
+  accs[idx].armyUntil = null;
+  accs[idx].warContract = false;
+  if (accs[idx].job === 'war') accs[idx].job = '';
+  save(accs);
+  pushAccNoti(accs[idx].nick, '🕊 Президент досрочно освободил вас со службы в Армии / Войне!');
+  renderPresident();
+}
+
+function toggleExile(idx) {
+  const accs = load(); if (!accs[idx]) return;
+  const nextState = !accs[idx].exiled;
+  if (!confirm(nextState ? `Изгнать ${accs[idx].nick} из города?` : `Вернуть ${accs[idx].nick} в город?`)) return;
+  accs[idx].exiled = nextState;
+  if (nextState) accs[idx].job = '';
+  save(accs); renderPresident();
 }
 
 function setSalary(idx) {
-  const val = parseFloat(document.getElementById(`sal-amount-${idx}`).value);
-  const period = document.getElementById(`sal-period-${idx}`).value;
-  if (isNaN(val) || val < 0) { alert('Введите корректную сумму зарплаты'); return; }
-  
-  const accs = load();
-  accs[idx].salary = val;
-  accs[idx].salaryPeriod = period;
-  accs[idx].lastSalaryUpdate = new Date().getTime();
-  save(accs);
-  renderPresident();
+  const val = parseFloat(document.getElementById(`sal-amt-${idx}`).value), per = document.getElementById(`sal-per-${idx}`).value;
+  if (isNaN(val)) { alert('Введите сумму!'); return; }
+  const accs = load(); accs[idx].salary = val; accs[idx].salaryPeriod = per; accs[idx].lastSalaryUpdate = Date.now(); save(accs); renderPresident();
 }
 
-function approveBonus(notiId) {
-  let notis = loadNotis();
-  const noti = notis.find(n => n.id === notiId);
-  if (!noti) return;
+function approveBonus(id) {
+  const notis = loadNotis(), n = notis.find(x => x.id === id); if (!n) return;
+  const cards = loadCards(), c = cards.find(x => !x.isGov && (x.ownerNick || '').toLowerCase() === n.from.toLowerCase());
+  if (c) { c.balance = parseFloat((c.balance + n.amount).toFixed(2)); addCardTx(c, 'plus', n.amount, 'премия от Президента'); saveCards(cards); }
+  pushAccNoti(n.from, `🎯 Президент одобрил вашу премию ${n.amount} GC!`);
+  saveNotis(notis.filter(x => x.id !== id)); renderPresident();
+}
 
-  const accs = load();
-  const acc = accs.find(a => a.nick.toLowerCase() === noti.from.toLowerCase());
-  if (acc) {
-    acc.balance = parseFloat((acc.balance + noti.amount).toFixed(2));
-    save(accs);
+function rejectBonus(id) {
+  const notis = loadNotis(), n = notis.find(x => x.id === id);
+  if (n) pushAccNoti(n.from, `❌ Президент отклонил запрос на премию ${n.amount} GC.`);
+  saveNotis(notis.filter(x => x.id !== id)); renderPresident();
+}
+
+function renderPresident() {
+  ensureGovCards(false);
+  renderOrgBox('pres-city-box', 'город', '🏛 Казна: город', 'green', 'cityTransfer');
+
+  const upgBox = document.getElementById('pres-upgrades-box');
+  if (upgBox) {
+    const lvl = parseInt(localStorage.getItem(STORE_KEY + '_city_upgrade') || '0');
+    const cost = (lvl + 1) * 100;
+    upgBox.innerHTML = `<div class="name">🏙 Улучшения города (Текущий уровень: ${lvl})</div>
+      <div class="pw" style="margin:4px 0;">Следующее улучшение города: <b>Уровень ${lvl + 1}</b> (оплата из казны «город»)</div>
+      <button class="btn small orange" style="width:100%;" onclick="buyCityUpgrade()">Купить улучшение города за ${cost} GC</button>`;
   }
-  
-  notis = notis.filter(n => n.id !== notiId);
-  saveNotis(notis);
-  renderPresident();
-  alert('Премия успешно выдана!');
+
+  const notis = loadNotis();
+  document.getElementById('pres-notifications').innerHTML = notis.length === 0 ? '<p class="sub" style="text-align:left;">Нет запросов</p>' : notis.map(n => `<div class="noti-item">
+    <div><b>${n.from}</b> требует премию <b>${n.amount} GC</b></div>
+    <div class="row"><button class="btn small green" onclick="approveBonus(${n.id})">Одобрить</button><button class="btn small red" onclick="rejectBonus(${n.id})">Отклонить</button></div>
+  </div>`).join('');
+
+  const q = document.getElementById('pres-search').value.toLowerCase().trim();
+  document.getElementById('pres-list').innerHTML = load().map((a, idx) => {
+    if (q && !a.nick.toLowerCase().includes(q)) return '';
+    const jobOpts = Object.keys(JOB_LABELS).map(k => `<option value="${k}" ${(a.job || '') === k ? 'selected' : ''}>${JOB_LABELS[k]}</option>`).join('');
+    const inService = isInArmyService(a) || a.warContract;
+    return `<div class="acct">
+      <div class="name">👑 ${formatNick(a)} ${a.exiled ? '<span class="badge-exile">ИЗГНАН</span>' : ''} ${inService ? '<span class="badge-blocked">АРМИЯ/ВОЙНА</span>' : ''}</div>
+      <div class="pw">Возраст: <b>${a.age ?? 18} лет</b> • HP: <b>${a.hp ?? 100}</b> • Оклад: <b>${a.salary || 0} GC</b></div>
+      <div class="pw">Работа: <b>${getJobLabel(a.job)}</b></div>
+      <div class="row" style="margin-top:6px;"><select id="job-sel-${idx}">${jobOpts}</select><button class="btn small" onclick="setCitizenJob(${idx})">Назначить</button>${a.job ? `<button class="btn small red" onclick="fireCitizenJob(${idx})">Уволить</button>` : ''}</div>
+      <div class="row"><input type="number" id="sal-amt-${idx}" step="0.01" placeholder="З/п"><select id="sal-per-${idx}"><option value="second">Сек</option><option value="minute">Мин</option><option value="hour" selected>Час</option><option value="day">День</option><option value="week">Нед</option><option value="month">Мес</option><option value="year">Год</option></select><button class="btn small green" onclick="setSalary(${idx})">Оклад</button></div>
+      ${inService ? `<button class="btn small green" style="width:100%; margin-top:4px;" onclick="releaseArmyOrWar(${idx})">🕊 Выпустить из Армии / Войны</button>` : ''}
+      <button class="btn small ${a.exiled ? 'green' : 'red'}" style="width:100%; margin-top:6px;" onclick="toggleExile(${idx})">${a.exiled ? '✅ Вернуть в город' : '🚫 Изгнать из города'}</button>
+    </div>`;
+  }).join('');
 }
 
-function rejectBonus(notiId) {
-  let notis = loadNotis();
-  notis = notis.filter(n => n.id !== notiId);
-  saveNotis(notis);
-  renderPresident();
-  alert('Запрос на премию отклонён.');
-}
-
-function blockAccount(idx) {
-  const hours = parseFloat(document.getElementById(`block-time-${idx}`).value);
-  if (isNaN(hours) || hours <= 0) { alert('Введите количество часов блокировки'); return; }
-  const accs = load();
-  accs[idx].blockedUntil = new Date().getTime() + (hours * 60 * 60 * 1000);
-  save(accs);
-  renderPresident();
-}
-
-function unblockAccount(idx) {
-  const accs = load();
-  accs[idx].blockedUntil = null;
-  save(accs);
-  renderPresident();
-}
-
-window.renderAdmin = renderAdmin;
-window.renderPresident = renderPresident;
-window.addMoney = addMoney;
-window.blockAccount = blockAccount;
-window.unblockAccount = unblockAccount;
-window.updateCurrentScreen = updateCurrentScreen;
-window.setSalary = setSalary;
-window.approveBonus = approveBonus;
-window.rejectBonus = rejectBonus;
+Object.assign(window, { applyAppTitle, changeAppTitle, showScreen, renderAdmin, renderPresident, renderPolice, renderBank, renderChurch, renderCourt, renderElder, renderHospital, renderSchool, renderUniv, renderCollege, renderArmy, renderWar, renderFootball, renderCasino, renderHoliday, renderMint, renderOgurchik, renderJanitor, renderGavisha, renderGavishaPublic, renderBns, renderBnsStore, renderKiller, renderTck, renderCollector, renderSupport, renderDevitoBuyer, renderDevitoSeller, renderDevitoChat, renderAccount, renderMyBank, renderCityServices, renderOgurchikViewer, addMoney, takeMoney, adminTransfer, deleteAccount, deleteCard, setBeeWidget, toggleElderCouncil, setAccountAgeAdmin, createAccount, createCardAdmin, createCardBank, cityTransfer, buyCityUpgrade, churchTransfer, hospitalTransfer, schoolTransfer, univTransfer, collegeTransfer, armyTransfer, warTransfer, casinoTransfer, holidayTransfer, mintTransfer, ogurchikTransfer, janitorTransfer, gavishaTransfer, bnsTransfer, killerTransfer, tckTransfer, collectorTransfer, toggleBaptism, setCitizenJob, fireCitizenJob, releaseArmyOrWar, toggleExile, directorHire, directorFire, openJobGate, quickEnterJob, submitJobLogin, jobLogout, ogurchikLogout, setClubSpin, issueCardFine, setFootballPrice, healPatient, executeKillerHit, sendTckDraft, catchTckRunner, respondTckNoti, clearAccountNotis, bankBlock, bankUnblock, updateClickerScreen, refreshActiveScreens, setSalary, approveBonus, rejectBonus, requestBonus, openTransactions, openBankTransactions, closeTransactionsScreen, renderTransactions, showTxComment, closeCommentModal, syncAllSalaries, ensureGovCards, checkClickerAccess, doCoinClick, exitClicker, openDevitoLogin, devitoLogin, devitoLogout, publishDevitoItem, setDevitoDiscount, deleteDevitoItem, withdrawDevitoBalance, buyDevitoItem, confirmDevitoOrder, cancelDevitoOrderBySeller, reportDevitoOrder, resolveSupportTicket, openDevitoChat, closeDevitoChat, sendDevitoChatMsg, accLogin, accLogout, toggleSleep, buyAccountUpgrade, linkCardToAccount, unlinkCard, openMyBank, onSelectActiveCard, doTransfer, createInvoice, payInvoice, declineInvoice, openCasinoWheel, spinCasinoWheel, openCityServices, startStreetFight, sendPoliceReport, visitEdu, signWarContract, buyHospitalHeal, openOgurchikViewer, publishGavishaPost, deleteGavishaPost, publishBnsItem, buyBnsItem, rebirthAccount });
+applyAppTitle(); ensureGovCards(true); startGlobalSalaryTicker();
 </script>
 </body>
 </html>
