@@ -1575,7 +1575,7 @@ function startGame(type) {
     renderUno();
   } else if (type === 'durak') {
     const suits = ['♠️', '♥️', '♦️', '♣️'];
-    const ranks =;
+ const ranks = Array.from({length: 9}, (_, i) => i + 6);
     const rName = r => ({ 11: 'В', 12: 'Д', 13: 'К', 14: 'Т' }[r] || r);
     const trump = suits[Math.floor(Math.random() * 4)];
     const deck = [];
@@ -1601,7 +1601,11 @@ function renderTtt() {
 }
 
 function checkTttWin(b, p) {
-  const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const w = [
+  new Array(0, 1, 2), new Array(3, 4, 5), new Array(6, 7, 8),
+  new Array(0, 3, 6), new Array(1, 4, 7), new Array(2, 5, 8),
+  new Array(0, 4, 8), new Array(2, 4, 6)
+];
   return w.some(line => line.every(i => b[i] === p));
 }
 
