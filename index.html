@@ -2566,7 +2566,82 @@ function renderMayor() {
     </div>`;
   }).join('');
 }
-
+function adminLogin() {
+  if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) { document.getElementById('admin-pass').value = ''; showScreen('admin'); }
+  else showMsg('admin-msg', 'Неверный пароль', 'err');
+}
+function mayorLogin() {
+  if (document.getElementById('mayor-pass').value === getMayorPassword()) { document.getElementById('mayor-pass').value = ''; showScreen('mayor'); }
+  else showMsg('mayor-msg', 'Неверный код Мэра', 'err');
+}
+function changeMayorPasswordAdmin() {
+  const val = document.getElementById('admin-mayor-pass-input').value.trim();
+  if (!val) { showMsg('title-msg', 'Введите новый код Мэра!', 'err'); return; }
+  localStorage.setItem(STORE_KEY + '_mayor_pass', val);
+  if (typeof window.syncToCloud === 'function') window.syncToCloud();
+  document.getElementById('admin-mayor-pass-input').value = '';
+  showMsg('title-msg', `Код Мэра изменён на «${val}»!`, 'ok');
+}
+function resetAllDataAdmin() {
+  if (!confirm('⚠️ СТЕРЕТЬ ВСЁ И НАЧАТЬ ЗАНОВО?\n\nВсе аккаунты, карты, виджеты, галерея, повестки и сроки тюрьмы будут удалены навсегда!')) return;
+  ['','_cards','_notis','_invoices','_gavisha','_gallery','_bns','_police_reports','_messenger','_devito_items','_devito_orders','_support_tickets'].forEach(s => localStorage.setItem(STORE_KEY + s, '[]'));
+  localStorage.setItem(STORE_KEY + '_city_upgrade', '0');
+  localStorage.setItem(STORE_KEY + '_week_start', String(Date.now()));
+  ensureGovCards(true); renderAdmin();
+  alert('💥 Город полностью очищен! Неделя зарплат и месяц армии запущены заново.');
+}
+function grantSubWidgetAdmin() {
+  const nick = document.getElementById('admin-sub-nick').value.trim(), type = document.getElementById('admin-sub-type').value, days = parseInt(document.getElementById('admin-sub-days').value);
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase()), cfg = SUB_WIDGETS[type];
+  if (!target || !cfg || isNaN(days) || days < 1) { showMsg('sub-admin-msg', 'Укажите существующий ник и срок в днях!', 'err'); return; }
+  target.subWidget = type; target.subUntil = Date.now() + days * 86400 * 1000; target.lastSubPay = Date.now();
+  save(accs); pushAccNoti(target.nick, `${cfg.icon} Admin выдал вам подписку ${cfg.name} на ${days} дн. (+${cfg.daily} GC/день на карту)!`);
+  document.getElementById('admin-sub-nick').value = ''; renderAdmin();
+  showMsg('sub-admin-msg', `${cfg.icon} ${cfg.name} выдан ${target.nick} на ${days} дн.!`, 'ok');
+}
+function removeSubWidgetAdmin() {
+  const nick = document.getElementById('admin-sub-nick').value.trim(), accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target) { showMsg('sub-admin-msg', 'Гражданин не найден!', 'err'); return; }
+  target.subWidget = ''; target.subUntil = null; target.lastSubPay = null; save(accs); renderAdmin();
+  showMsg('sub-admin-msg', `Виджет подписки снят с ${target.nick}.`, 'ok');
+}
+function assignGalleryWorkerAdmin() {
+  const nick = document.getElementById('admin-gallery-nick').value.trim(), accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target) { showMsg('gallery-admin-msg', 'Аккаунт не найден!', 'err'); return; }
+  accs.forEach(a => { if (a.job === 'gallery') a.job = ''; }); target.job = 'gallery'; save(accs);
+  pushAccNoti(target.nick, '🖼 Admin назначил вас единственным художником Пидековской галереи!');
+  document.getElementById('admin-gallery-nick').value = ''; renderAdmin();
+  showMsg('gallery-admin-msg', `${target.nick} назначен в Пидековскую галерею!`, 'ok');
+}
+function setBeeWidget(type) {
+  const nick = document.getElementById('admin-bee-nick').value.trim(), accs = load(), acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!acc) { showMsg('bee-admin-msg', 'Аккаунт не найден!', 'err'); return; }
+  acc.beeWidget = type; save(accs); document.getElementById('admin-bee-nick').value = ''; renderAdmin();
+  showMsg('bee-admin-msg', 'Виджет пчёлки обновлён!', 'ok');
+}
+function toggleElderCouncil(addState, targetNick) {
+  const nick = targetNick || document.getElementById('admin-elder-nick').value.trim(), accs = load(), acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!acc) { showMsg('elder-admin-msg', 'Аккаунт не найден!', 'err'); return; }
+  acc.isElderCouncil = addState; if (!addState && acc.job && acc.job.startsWith('elder')) acc.job = '';
+  save(accs); if (!targetNick) document.getElementById('admin-elder-nick').value = ''; renderAdmin();
+  showMsg('elder-admin-msg', addState ? `${acc.nick} добавлен в Совет Старейшин!` : `${acc.nick} убран из Совета.`, 'ok');
+}
+function createAccount() {
+  const nick = document.getElementById('new-nick').value.trim(), pass = document.getElementById('new-pass').value, age = parseInt(document.getElementById('new-age').value);
+  if (!nick || !pass) { showMsg('create-msg', 'Введите ник и пароль!', 'err'); return; }
+  const accs = load(); if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) { showMsg('create-msg', 'Такой ник уже есть!', 'err'); return; }
+  accs.push({ nick, pass, age: isNaN(age) || age < 0 ? 18 : age, lastAgeUpdate: Date.now(), hp: 100, lastHpDay: getTodayKey(), beeWidget: '', workWidget: '', subWidget: '', subUntil: null, lastSubPay: null, isElderCouncil: false, baptized: false, job: '', weeklyShifts: 0, taxAmount: 0, taxPeriod: 'day', lastTaxUpdate: null, upgradeLevel: 0, exiled: false, isInoagent: false, blockedUntil: null, blockReason: '', jailUntil: null, jailReason: '', armyUntil: null, warContract: false, footballPrice: 0, devitoBalance: 0, clickerPaid: 0, notifications: [] });
+  save(accs); document.getElementById('new-nick').value = ''; document.getElementById('new-pass').value = ''; document.getElementById('new-age').value = '';
+  showMsg('create-msg', `Аккаунт «${nick}» создан!`, 'ok'); renderAdmin();
+}
+function createCardAdmin() {
+  const num = document.getElementById('new-card-num').value.trim(), pin = document.getElementById('new-card-pin').value;
+  if (!num || !pin || isGovCard(num)) { showMsg('create-card-msg', 'Некорректный номер или PIN карты!', 'err'); return; }
+  const cards = loadCards(); if (cards.some(c => c.num.toLowerCase() === num.toLowerCase())) { showMsg('create-card-msg', 'Такая карта уже существует!', 'err'); return; }
+  cards.push({ num, pin, balance: 0, blockedUntil: null, ownerNick: '', transactions: [], isGov: false });
+  saveCards(cards); document.getElementById('new-card-num').value = ''; document.getElementById('new-card-pin').value = '';
+  showMsg('create-card-msg', `Карта «${num}» выпущена!`, 'ok'); renderAdmin();
+}
 Object.assign(window, { applyAppTitle, changeAppTitle, showScreen, adminLogin, mayorLogin, changeMayorPasswordAdmin, resetAllDataAdmin, grantSubWidgetAdmin, removeSubWidgetAdmin, assignGalleryWorkerAdmin, renderAdmin, renderMayor, renderPolice, renderBank, renderChurch, renderCourt, renderElder, renderHospital, renderSchool, renderUniv, renderCollege, renderArmy, renderWar, renderFootball, renderCasino, renderHoliday, renderMint, renderOgurchik, renderGallery, renderGalleryPublic, renderJanitor, renderGavisha, renderGavishaPublic, renderBns, renderBnsStore, renderKiller, renderTck, renderCollector, renderSupport, renderDevitoBuyer, renderDevitoSeller, renderDevitoChat, renderAccount, renderMyBank, renderMessenger, renderCityServices, renderOgurchikViewer, addMoney, takeMoney, adminTransfer, deleteAccount, deleteCard, setBeeWidget, toggleElderCouncil, setAccountAgeAdmin, changeAccPassAdmin, changeCardPinAdmin, sendMsgFromAdmin, blockAccAdmin, unblockAccAdmin, createAccount, createCardAdmin, createCardBank, cityTransfer, buyCityUpgrade, payWeeklyWageMayor, churchTransfer, hospitalTransfer, schoolTransfer, univTransfer, collegeTransfer, armyTransfer, warTransfer, casinoTransfer, holidayTransfer, mintTransfer, ogurchikTransfer, galleryTransfer, janitorTransfer, gavishaTransfer, bnsTransfer, killerTransfer, tckTransfer, collectorTransfer, toggleBaptism, setCitizenJob, fireCitizenJob, setCitizenTax, makeInoagentForever, releaseArmyOrWar, toggleExile, directorHire, directorFire, openJobGate, quickEnterJob, submitJobLogin, jobLogout, ogurchikLogout, setClubSpin, issueCardFine, sendToJail, sendToJailFromCourt, setFootballPrice, healPatient, executeKillerHit, sendTckDraft, catchTckRunner, respondTckNoti, clearAccountNotis, bankBlock, bankUnblock, updateClickerScreen, refreshActiveScreens, approveBonus, rejectBonus, requestBonus, openTransactions, openBankTransactions, closeTransactionsScreen, renderTransactions, showTxComment, closeCommentModal, syncAllSalaries, ensureGovCards, checkClickerAccess, doCoinClick, exitClicker, openDevitoLogin, devitoLogin, devitoLogout, publishDevitoItem, setDevitoDiscount, deleteDevitoItem, withdrawDevitoBalance, buyDevitoItem, confirmDevitoOrder, cancelDevitoOrderBySeller, reportDevitoOrder, resolveSupportTicket, openDevitoChat, closeDevitoChat, sendDevitoChatMsg, accLogin, accLogout, toggleSleep, buyAccountUpgrade, linkCardToAccount, unlinkCard, openMyBank, onSelectActiveCard, doTransfer, createInvoice, payInvoice, declineInvoice, openMessenger, openMessengerPeer, sendMessengerMsg, openGamesMenu, startGame, playTtt, shootBs, pullJenga, playUnoCard, drawUnoCard, playDurakCard, publishGalleryItem, deleteGalleryItem, buyGalleryItem, openCasinoWheel, spinCasinoWheel, openCityServices, startStreetFight, sendPoliceReport, visitEdu, signWarContract, buyHospitalHeal, openOgurchikViewer, publishGavishaPost, deleteGavishaPost, publishBnsItem, buyBnsItem, rebirthAccount });
 
 applyAppTitle(); ensureGovCards(true); startGlobalSalaryTicker();
