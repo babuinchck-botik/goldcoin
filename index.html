@@ -2065,6 +2065,158 @@ function renderDevitoBuyer() {
   document.getElementById('dev-items-list').innerHTML = items.length === 0 ? '<p class="sub">Товаров нет</p>' : items.map(i => `<div class="acct"><img src="${i.photo}" class="item-photo"><div class="name">${i.title} ${i.discount > 0 ? `<span class="badge-sale">-${i.discount}%</span>` : ''}</div><div class="bal">${getEffectivePrice(i)} GC • 📦 ${i.qty ?? 1} шт. • 📍 ${i.addr}</div>${i.seller.toLowerCase() === devitoNick.toLowerCase() ? '<div class="pw" style="color:#ffd166;">Ваше объявление</div>' : `<button class="btn small green" style="width:100%; margin-top:6px;" onclick="buyDevitoItem(${i.id})">🛒 Купить за ${getEffectivePrice(i)} GC</button>`}</div>`).join('');
 }
 function changeAccPassAdmin(idx) {
+ function buyDevitoItem(id) {
+  if (!devitoNick) return;
+  const items = loadDevitoItems(), it = items.find(i => i.id === id);
+  const qty = it ? (it.qty ?? (it.sold ? 0 : 1)) : 0; if (!it || qty <= 0) return;
+  const price = getEffectivePrice(it), cards = loadCards();
+  const bCard = cards.find(c => (c.ownerNick || '').toLowerCase() === devitoNick.toLowerCase());
+  if (!bCard || bCard.balance < price) { showMsg('dev-buyer-msg', 'Нужна карта с достаточным балансом!', 'err'); return; }
+  bCard.balance = parseFloat((bCard.balance - price).toFixed(2));
+  addCardTx(bCard, 'minus', price, `заказ на Девито: ${it.title}`);
+  it.qty = qty - 1; if (it.qty <= 0) it.sold = true;
+  saveCards(cards); saveDevitoItems(items);
+  const orders = loadDevitoOrders(), oid = Date.now();
+  orders.unshift({ id: oid, itemId: it.id, title: it.title, price, addr: it.addr, buyer: devitoNick, seller: it.seller, status: 'pending', messages: [{ sender: 'Система', text: `Оплачено (${price} GC). Адрес: ${it.addr}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }] });
+  saveDevitoOrders(orders); openDevitoChat(oid);
+}
+
+function confirmDevitoOrder(id) {
+  const orders = loadDevitoOrders(), o = orders.find(x => x.id === id);
+  if (!o || (o.status && o.status !== 'pending') || !confirm('Подтвердить получение?')) return;
+  const accs = load(), s = accs.find(a => a.nick.toLowerCase() === o.seller.toLowerCase());
+  if (s) s.devitoBalance = parseFloat(((s.devitoBalance || 0) + o.price).toFixed(2));
+  o.status = 'completed'; o.messages.push({ sender: 'Система', text: `✅ Покупатель подтвердил получение! ${o.price} GC начислены продавцу.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  save(accs); saveDevitoOrders(orders); refreshActiveScreens();
+}
+function cancelDevitoOrderBySeller(id) {
+  const orders = loadDevitoOrders(), o = orders.find(x => x.id === id);
+  if (!o || (o.status && o.status !== 'pending') || !confirm('Отменить заказ и вернуть деньги?')) return;
+  const cards = loadCards(), bCard = cards.find(c => (c.ownerNick || '').toLowerCase() === o.buyer.toLowerCase());
+  if (bCard) { bCard.balance = parseFloat((bCard.balance + o.price).toFixed(2)); addCardTx(bCard, 'plus', o.price, `возврат Девито: ${o.title}`); saveCards(cards); }
+  o.status = 'cancelled'; o.messages.push({ sender: 'Система', text: '❌ Заказ отменён продавцом, средства возвращены.', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  saveDevitoOrders(orders); renderDevitoChat(true);
+}
+function reportDevitoOrder(id) {
+  const o = loadDevitoOrders().find(x => x.id === id); if (!o || !devitoNick) return;
+  const r = prompt('Опишите жалобу для Поддержки:'); if (!r || !r.trim()) return;
+  const t = loadSupportTickets(); t.unshift({ id: Date.now(), orderId: o.id, itemTitle: o.title, price: o.price, fromNick: devitoNick, fromRole: devitoNick.toLowerCase() === o.buyer.toLowerCase() ? 'Покупатель' : 'Продавец', buyer: o.buyer, seller: o.seller, reason: r.trim(), resolved: false });
+  saveSupportTickets(t); showMsg('dev-chat-msg', 'Жалоба отправлена в Поддержку!', 'ok');
+}
+function openDevitoChat(id) { activeOrderId = id; showScreen('devito-chat'); renderDevitoChat(true); }
+function closeDevitoChat() { activeOrderId = null; showScreen(devitoRole === 'buyer' ? 'devito-buyer' : 'devito-seller'); }
+function renderDevitoChat(scroll = false) {
+  const o = loadDevitoOrders().find(x => x.id === activeOrderId); if (!o || !devitoNick) return;
+  document.getElementById('dev-chat-title').textContent = `💬 ${o.title}`;
+  document.getElementById('dev-chat-sub').textContent = `Покупатель: ${o.buyer} • Продавец: ${o.seller} • ${o.price} GC`;
+  const st = o.status || 'pending', ctrl = document.getElementById('dev-chat-controls');
+  document.getElementById('dev-chat-status').textContent = `Статус: ${st}`; ctrl.innerHTML = '';
+  if (st === 'pending') {
+    if (devitoNick.toLowerCase() === o.buyer.toLowerCase()) ctrl.innerHTML += `<button class="btn small green" style="width:100%;" onclick="confirmDevitoOrder(${o.id})">✅ Подтвердить получение</button>`;
+    if (devitoNick.toLowerCase() === o.seller.toLowerCase()) ctrl.innerHTML += `<button class="btn small red" style="width:100%;" onclick="cancelDevitoOrderBySeller(${o.id})">❌ Отменить заказ</button>`;
+  }
+  ctrl.innerHTML += `<button class="btn small support" style="width:100%;" onclick="reportDevitoOrder(${o.id})">🆘 Жалоба в Поддержку</button>`;
+  const box = document.getElementById('dev-chat-messages');
+  box.innerHTML = o.messages.map(m => `<div class="chat-msg ${m.sender.toLowerCase() === devitoNick.toLowerCase() ? 'me' : 'other'}"><div><b>${m.sender}:</b> ${m.text}</div><div class="chat-meta">${m.time}</div></div>`).join('');
+  if (scroll) box.scrollTop = box.scrollHeight;
+}
+function sendDevitoChatMsg() {
+  const inp = document.getElementById('dev-chat-input'), txt = inp.value.trim(); if (!txt || !activeOrderId || !devitoNick) return;
+  const orders = loadDevitoOrders(), o = orders.find(x => x.id === activeOrderId);
+  if (o) { o.messages.push({ sender: devitoNick, text: txt, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }); saveDevitoOrders(orders); inp.value = ''; renderDevitoChat(true); }
+}
+function adminLogin() {
+  if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) { document.getElementById('admin-pass').value = ''; showScreen('admin'); }
+  else showMsg('admin-msg', 'Неверный пароль', 'err');
+}
+function mayorLogin() {
+  if (document.getElementById('mayor-pass').value === getMayorPassword()) { document.getElementById('mayor-pass').value = ''; showScreen('mayor'); }
+  else showMsg('mayor-msg', 'Неверный код Мэра', 'err');
+}
+function changeMayorPasswordAdmin() {
+  const val = document.getElementById('admin-mayor-pass-input').value.trim();
+  if (!val) { showMsg('title-msg', 'Введите новый код Мэра!', 'err'); return; }
+  localStorage.setItem(STORE_KEY + '_mayor_pass', val);
+  if (typeof window.syncToCloud === 'function') window.syncToCloud();
+  document.getElementById('admin-mayor-pass-input').value = '';
+  showMsg('title-msg', `Код Мэра изменён на «${val}»!`, 'ok');
+}
+function resetAllDataAdmin() {
+  if (!confirm('⚠️ СТЕРЕТЬ ВСЁ И НАЧАТЬ ЗАНОВО?\n\nВсе аккаунты, карты, виджеты, галерея, повестки и сроки тюрьмы будут удалены навсегда!')) return;
+  ['','_cards','_notis','_invoices','_gavisha','_gallery','_bns','_police_reports','_messenger','_devito_items','_devito_orders','_support_tickets'].forEach(s => localStorage.setItem(STORE_KEY + s, '[]'));
+  localStorage.setItem(STORE_KEY + '_city_upgrade', '0');
+  localStorage.setItem(STORE_KEY + '_week_start', String(Date.now()));
+  ensureGovCards(true); renderAdmin();
+  alert('💥 Город полностью очищен! Неделя зарплат и месяц армии запущены заново.');
+}
+
+function grantSubWidgetAdmin() {
+  const nick = document.getElementById('admin-sub-nick').value.trim();
+  const type = document.getElementById('admin-sub-type').value;
+  const days = parseInt(document.getElementById('admin-sub-days').value);
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  const cfg = SUB_WIDGETS[type];
+  if (!target || !cfg || isNaN(days) || days < 1) { showMsg('sub-admin-msg', 'Укажите существующий ник и срок в днях!', 'err'); return; }
+  target.subWidget = type;
+  target.subUntil = Date.now() + days * 86400 * 1000;
+  target.lastSubPay = Date.now();
+  save(accs);
+  pushAccNoti(target.nick, `${cfg.icon} Admin выдал вам подписку ${cfg.name} на ${days} дн. (+${cfg.daily} GC/день на карту)!`);
+  document.getElementById('admin-sub-nick').value = '';
+  renderAdmin();
+  showMsg('sub-admin-msg', `${cfg.icon} ${cfg.name} выдан ${target.nick} на ${days} дн.!`, 'ok');
+}
+
+function removeSubWidgetAdmin() {
+  const nick = document.getElementById('admin-sub-nick').value.trim();
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target) { showMsg('sub-admin-msg', 'Гражданин не найден!', 'err'); return; }
+  target.subWidget = ''; target.subUntil = null; target.lastSubPay = null;
+  save(accs); renderAdmin();
+  showMsg('sub-admin-msg', `Виджет подписки снят с ${target.nick}.`, 'ok');
+}
+
+function assignGalleryWorkerAdmin() {
+  const nick = document.getElementById('admin-gallery-nick').value.trim();
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target) { showMsg('gallery-admin-msg', 'Аккаунт не найден!', 'err'); return; }
+  accs.forEach(a => { if (a.job === 'gallery') a.job = ''; });
+  target.job = 'gallery'; save(accs);
+  pushAccNoti(target.nick, '🖼 Admin назначил вас единственным художником Пидековской галереи!');
+  document.getElementById('admin-gallery-nick').value = ''; renderAdmin();
+  showMsg('gallery-admin-msg', `${target.nick} назначен в Пидековскую галерею!`, 'ok');
+}
+function setBeeWidget(type) {
+  const nick = document.getElementById('admin-bee-nick').value.trim();
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!acc) { showMsg('bee-admin-msg', 'Аккаунт не найден!', 'err'); return; }
+  acc.beeWidget = type; save(accs); document.getElementById('admin-bee-nick').value = ''; renderAdmin();
+  showMsg('bee-admin-msg', 'Виджет пчёлки обновлён!', 'ok');
+}
+function toggleElderCouncil(addState, targetNick) {
+  const nick = targetNick || document.getElementById('admin-elder-nick').value.trim();
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!acc) { showMsg('elder-admin-msg', 'Аккаунт не найден!', 'err'); return; }
+  acc.isElderCouncil = addState; if (!addState && acc.job && acc.job.startsWith('elder')) acc.job = '';
+  save(accs); if (!targetNick) document.getElementById('admin-elder-nick').value = ''; renderAdmin();
+  showMsg('elder-admin-msg', addState ? `${acc.nick} добавлен в Совет Старейшин!` : `${acc.nick} убран из Совета.`, 'ok');
+}
+function createAccount() {
+  const nick = document.getElementById('new-nick').value.trim(), pass = document.getElementById('new-pass').value, age = parseInt(document.getElementById('new-age').value);
+  if (!nick || !pass) { showMsg('create-msg', 'Введите ник и пароль!', 'err'); return; }
+  const accs = load(); if (accs.some(a => a.nick.toLowerCase() === nick.toLowerCase())) { showMsg('create-msg', 'Такой ник уже есть!', 'err'); return; }
+  accs.push({ nick, pass, age: isNaN(age) || age < 0 ? 18 : age, lastAgeUpdate: Date.now(), hp: 100, lastHpDay: getTodayKey(), beeWidget: '', workWidget: '', subWidget: '', subUntil: null, lastSubPay: null, isElderCouncil: false, baptized: false, job: '', weeklyShifts: 0, taxAmount: 0, taxPeriod: 'day', lastTaxUpdate: null, upgradeLevel: 0, exiled: false, isInoagent: false, blockedUntil: null, blockReason: '', jailUntil: null, jailReason: '', armyUntil: null, warContract: false, footballPrice: 0, devitoBalance: 0, clickerPaid: 0, notifications: [] });
+  save(accs); document.getElementById('new-nick').value = ''; document.getElementById('new-pass').value = ''; document.getElementById('new-age').value = '';
+  showMsg('create-msg', `Аккаунт «${nick}» создан!`, 'ok'); renderAdmin();
+}
+function createCardAdmin() {
+  const num = document.getElementById('new-card-num').value.trim(), pin = document.getElementById('new-card-pin').value;
+  if (!num || !pin || isGovCard(num)) { showMsg('create-card-msg', 'Некорректный номер или PIN карты!', 'err'); return; }
+  const cards = loadCards(); if (cards.some(c => c.num.toLowerCase() === num.toLowerCase())) { showMsg('create-card-msg', 'Такая карта уже существует!', 'err'); return; }
+  cards.push({ num, pin, balance: 0, blockedUntil: null, ownerNick: '', transactions: [], isGov: false });
+  saveCards(cards); document.getElementById('new-card-num').value = ''; document.getElementById('new-card-pin').value = '';
+  showMsg('create-card-msg', `Карта «${num}» выпущена!`, 'ok'); renderAdmin();
+}
   const val = document.getElementById(`adm-pass-${idx}`).value.trim(); if (!val) return;
   const accs = load(); const a = accs.at(idx); if (a) { a.pass = val; save(accs); renderAdmin(); }
 }
