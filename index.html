@@ -2800,6 +2800,229 @@ function createCardAdmin() {
   saveCards(cards); document.getElementById('new-card-num').value = ''; document.getElementById('new-card-pin').value = '';
   showMsg('create-card-msg', `Карта «${num}» выпущена!`, 'ok'); renderAdmin();
 }
+ function accLogin() {
+  syncAllSalaries(false);
+  const nick = document.getElementById('acc-nick').value.trim(), pass = document.getElementById('acc-pass').value;
+  const acc = load().find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (!acc) { showMsg('acc-msg', 'Неверный ник или пароль', 'err'); return; }
+  if (acc.isInoagent) { showMsg('acc-msg', '🚫 Вы признаны ИНОАГЕНТОМ и изгнаны из города навсегда!', 'err'); return; }
+  if (acc.exiled) { showMsg('acc-msg', 'Вы изгнаны из города по решению Мэра!', 'err'); return; }
+  if (isAccBlocked(acc)) { showMsg('acc-msg', `Аккаунт заблокирован (${getRemainingHours(acc.blockedUntil)}ч). Причина: ${acc.blockReason || 'Нарушение правил'}`, 'err'); return; }
+  document.getElementById('acc-nick').value = ''; document.getElementById('acc-pass').value = '';
+  currentNick = acc.nick;
+  const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  activeCardNum = myCards.length > 0 ? myCards.at(0).num : null;
+  showScreen('account');
+}
+function accLogout() { syncAllSalaries(true); currentNick = null; activeCardNum = null; showScreen('home'); }
+function toggleSleep() {
+  if (!currentNick) return;
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  const hour = new Date().getHours();
+  if (!acc.sleepingSince) {
+    if (hour < 20 && hour >= 7) { showMsg('bonus-msg', '😴 Лечь спать можно только с 20:00 до 07:00!', 'err'); return; }
+    acc.sleepingSince = Date.now(); save(accs); renderAccount();
+  } else {
+    const sleptHours = Math.max(0, (Date.now() - acc.sleepingSince) / 3600000), healed = Math.floor(sleptHours * 10);
+    acc.hp = Math.min(100, (acc.hp ?? 100) + healed); acc.sleepingSince = null; save(accs); renderAccount();
+    showMsg('bonus-msg', `☀️ Вы проснулись! Восстановлено +${healed} HP (проспали ${sleptHours.toFixed(1)} ч.)`, 'ok');
+  }
+}
+function buyAccountUpgrade() {
+  if (!currentNick) return;
+  const accs = load(), cards = loadCards(), acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  const lvl = acc.upgradeLevel || 0; if (lvl >= 10) return;
+  const cost = (lvl + 1) * 100, card = cards.find(c => c.num === activeCardNum) || cards.find(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  if (!card) { showMsg('bonus-msg', 'Сначала привяжите банковскую карту!', 'err'); return; }
+  if (card.balance < cost) { showMsg('bonus-msg', `Недостаточно средств на карте (${cost} GC)!`, 'err'); return; }
+  card.balance = parseFloat((card.balance - cost).toFixed(2)); addCardTx(card, 'minus', cost, `улучшение аккаунта (Уровень ${lvl + 1})`);
+  acc.upgradeLevel = lvl + 1; save(accs); saveCards(cards); renderAccount();
+  showMsg('bonus-msg', `⭐ Куплено улучшение аккаунта Уровень ${acc.upgradeLevel} за ${cost} GC!`, 'ok');
+}
+function respondTckNoti(notiId, action) {
+  if (!currentNick) return;
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc || !acc.notifications) return;
+  const noti = acc.notifications.find(n => n.id === notiId); if (!noti || noti.tckHandled) return;
+  noti.tckHandled = true;
+  if (action === 'accept') {
+    acc.armyUntil = Date.now() + 30 * 86400 * 1000; noti.text += ' → ✅ Вы согласились пойти в Армию на 1 месяц.';
+  } else {
+    const code = String(Math.floor(1000 + Math.random() * 9000)); acc.escapeCode = code;
+    noti.text += ` → 🏃 Вы нажали БЕЖАТЬ! Ваш код побега: ${code}`;
+  }
+  save(accs); renderAccount();
+}
+function clearAccountNotis() {
+  if (!currentNick) return;
+  const accs = load(), acc = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (acc) { acc.notifications = []; save(accs); renderAccount(); }
+}
+function renderAccount() {
+  if (!currentNick) return;
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  if (acc.exiled || acc.isInoagent || isAccBlocked(acc)) { alert('Доступ к аккаунту закрыт!'); accLogout(); return; }
+  document.getElementById('acc-title').textContent = '👤 ' + formatNick(acc);
+  const hpVal = Math.max(0, Math.min(100, acc.hp ?? 100));
+  const jailTag = isInJail(acc) ? ` • <span class="badge-blocked">⛓ В ТЮРЬМЕ (${getRemainingHours(acc.jailUntil)}ч)</span>` : '';
+  const armyTag = isInArmyService(acc) ? ` • <span class="badge-blocked">🪖 В АРМИИ (${Math.ceil((acc.armyUntil - Date.now()) / 86400000)} дн.)</span>` : '';
+  const warTag = acc.warContract ? ` • <span class="badge-blocked">⚔️ КОНТРАКТ ВОЙНЫ</span>` : '';
+  document.getElementById('acc-age-hp').innerHTML = `Возраст: <b>${acc.age ?? 18} лет</b> • Здоровье: <b>${hpVal}/100 HP</b>${jailTag}${armyTag}${warTag}`;
+  document.getElementById('acc-hp-bar').style.width = hpVal + '%';
+  document.getElementById('acc-widgets').innerHTML = renderWidgetsHtml(acc);
+
+  const desc = document.getElementById('acc-salary-desc');
+  if (acc.taxAmount && acc.taxAmount > 0) {
+    const pText = { second:'секунду', minute:'минуту', hour:'час', day:'день', week:'неделю', month:'месяц', year:'год' }[acc.taxPeriod] || 'день';
+    desc.textContent = `Налог от Мэра: -${acc.taxAmount} GC каждый ${pText} • Смен за неделю: ${acc.weeklyShifts || 0}`;
+    desc.style.color = '#ff7b7b';
+  } else {
+    desc.textContent = `Налог не назначен • Смен за неделю: ${acc.weeklyShifts || 0}`;
+    desc.style.color = '#9fb0c9';
+  }
+
+  const sleepBox = document.getElementById('acc-sleep-box');
+  if (sleepBox) {
+    if (acc.sleepingSince) {
+      const hrs = ((Date.now() - acc.sleepingSince) / 3600000).toFixed(2);
+      sleepBox.innerHTML = `<div class="name">😴 Вы сейчас спите (${hrs} ч.)</div><div class="pw" style="margin:4px 0;">+10 HP за каждый полный час сна</div><button class="btn small green" style="width:100%;" onclick="toggleSleep()">☀️ Проснуться</button>`;
+    } else {
+      sleepBox.innerHTML = `<div class="name">🛏 Отдых и сон</div><div class="pw" style="margin:4px 0;">Доступно с 20:00 до 07:00 (+10 HP за час)</div><button class="btn small" style="width:100%;" onclick="toggleSleep()">😴 Лечь спать</button>`;
+    }
+  }
+
+  const upgBox = document.getElementById('acc-upgrades-box');
+  if (upgBox) {
+    const lvl = acc.upgradeLevel || 0;
+    if (lvl >= 10) upgBox.innerHTML = `<div class="name">⭐ Улучшения аккаунта: Максимум (10 / 10)</div><div class="pw">Все 10 уровней улучшений куплены!</div>`;
+    else {
+      const nextCost = (lvl + 1) * 100;
+      upgBox.innerHTML = `<div class="name">⭐ Улучшения аккаунта (${lvl} / 10)</div><div class="pw" style="margin:4px 0;">Следующее улучшение: <b>Уровень ${lvl + 1}</b></div><button class="btn small orange" style="width:100%;" onclick="buyAccountUpgrade()">Купить Уровень ${lvl + 1} за ${nextCost} GC</button>`;
+    }
+  }
+
+  const notisBox = document.getElementById('acc-notis-box'), notisList = document.getElementById('acc-notis-list');
+  const myNotis = acc.notifications || [];
+  if (myNotis.length === 0) { notisBox.classList.add('hidden'); }
+  else {
+    notisBox.classList.remove('hidden');
+    notisList.innerHTML = myNotis.map(n => {
+      const tckBtns = (n.isTck && !n.tckHandled) ? `<div class="row" style="margin-top:6px;"><button class="btn small green" onclick="respondTckNoti(${n.id},'accept')">✅ Согласиться</button><button class="btn small red" onclick="respondTckNoti(${n.id},'run')">🏃 Бежать</button></div>` : '';
+      return `<div class="noti-item" style="padding:8px; margin:4px 0;"><div style="font-size:13px;">${n.text}</div>${tckBtns}<div class="tx-date">${n.date}</div></div>`;
+    }).join('');
+  }
+
+  const jobBox = document.getElementById('acc-job-box');
+  if (acc.job) {
+    const dept = acc.job.split('_').at(0);
+    jobBox.classList.remove('hidden');
+    jobBox.innerHTML = `<div class="city-box" style="margin:0;"><div class="name">💼 Ваша работа: ${getJobLabel(acc.job)}</div><button class="btn small green" style="width:100%; margin-top:6px;" onclick="quickEnterJob('${dept}')">🚪 Выйти на смену (-5 HP)</button></div>`;
+  } else { jobBox.classList.add('hidden'); jobBox.innerHTML = ''; }
+
+  const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  document.getElementById('acc-cards-list').innerHTML = myCards.length === 0 ? '<p class="sub" style="text-align:left;">Привязанных карт пока нет</p>' :
+    myCards.map(c => `<div class="bank-card-ui"><div style="display:flex; justify-content:space-between;"><span class="name">💳 Карта: ${c.num}</span><button class="btn tiny red" onclick="unlinkCard('${c.num}')">Отвязать</button></div><div class="bal" style="font-size:18px; font-weight:800;">${parseFloat(c.balance.toFixed(2))} GC</div></div>`).join('');
+}
+
+function linkCardToAccount() {
+  if (!currentNick) return;
+  const num = document.getElementById('link-card-num').value.trim(), pin = document.getElementById('link-card-pin').value;
+  if (!num || !pin) { showMsg('link-card-msg', 'Введите номер карты и PIN!', 'err'); return; }
+  const cards = loadCards(), card = cards.find(c => c.num.toLowerCase() === num.toLowerCase() && c.pin === pin);
+  if (!card || card.isGov) { showMsg('link-card-msg', 'Карта не найдена или неверный PIN!', 'err'); return; }
+  if (card.ownerNick && card.ownerNick.toLowerCase() !== currentNick.toLowerCase()) { showMsg('link-card-msg', 'Эта карта уже привязана к другому аккаунту!', 'err'); return; }
+  card.ownerNick = currentNick; saveCards(cards);
+  if (!activeCardNum) activeCardNum = card.num;
+  document.getElementById('link-card-num').value = ''; document.getElementById('link-card-pin').value = '';
+  showMsg('link-card-msg', `Карта ${card.num} привязана к аккаунту!`, 'ok'); renderAccount();
+}
+function unlinkCard(num) {
+  if (!confirm(`Отвязать карту ${num}?`)) return;
+  const cards = loadCards(), card = cards.find(c => c.num.toLowerCase() === num.toLowerCase());
+  if (card) { card.ownerNick = ''; saveCards(cards); if (activeCardNum === num) activeCardNum = null; renderAccount(); }
+}
+function issueCardFine(idx, amtId, rsnId, msgId, label, renderFn) {
+  const amt = parseFloat(document.getElementById(amtId).value), rsn = document.getElementById(rsnId).value.trim();
+  if (isNaN(amt) || amt <= 0) { showMsg(msgId, 'Введите сумму!', 'err'); return; }
+  const cards = loadCards(); const c = cards.at(idx);
+  if (c) { c.balance = parseFloat((c.balance - amt).toFixed(2)); addCardTx(c, 'minus', amt, label, rsn); saveCards(cards); renderFn(); showMsg(msgId, `Выписано ${amt} GC!`, 'ok'); }
+}
+
+function sendToJail(msgId) {
+  const nick = document.getElementById('jail-target-nick').value.trim(), hrs = parseFloat(document.getElementById('jail-hours').value), rsn = document.getElementById('jail-reason').value.trim();
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target || isNaN(hrs) || hrs <= 0) { showMsg(msgId, 'Укажите нарушителя и срок в часах!', 'err'); return; }
+  target.jailUntil = Date.now() + hrs * 3600000; target.jailReason = rsn || 'Арест Полицией';
+  save(accs); pushAccNoti(target.nick, `⛓ Полиция посадила вас в Тюрьму на ${hrs} ч. Причина: ${target.jailReason}`);
+  document.getElementById('jail-target-nick').value = ''; document.getElementById('jail-hours').value = ''; document.getElementById('jail-reason').value = '';
+  showMsg(msgId, `${target.nick} отправлен в Тюрьму на ${hrs} ч.!`, 'ok');
+}
+function sendToJailFromCourt() {
+  const nick = document.getElementById('court-jail-nick').value.trim(), hrs = parseFloat(document.getElementById('court-jail-hours').value), rsn = document.getElementById('court-jail-reason').value.trim();
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === nick.toLowerCase());
+  if (!target || isNaN(hrs) || hrs <= 0) { showMsg('court-action-msg', 'Укажите подсудимого и срок в часах!', 'err'); return; }
+  target.jailUntil = Date.now() + hrs * 3600000; target.jailReason = rsn || 'Приговор Суда';
+  save(accs); pushAccNoti(target.nick, `⚖️ Суд приговорил вас к Тюрьме на ${hrs} ч. Приговор: ${target.jailReason}`);
+  document.getElementById('court-jail-nick').value = ''; document.getElementById('court-jail-hours').value = ''; document.getElementById('court-jail-reason').value = '';
+  showMsg('court-action-msg', `${target.nick} осуждён на ${hrs} ч. Тюрьмы!`, 'ok');
+}
+function renderPolice() {
+  renderDirectorPanel('police', 'police-director-box', ['police_uch','police_oper','police_sled','police_dozn','police_dps','police_pps','police_omon']);
+  const reps = loadPoliceReports();
+  document.getElementById('police-reports-list').innerHTML = reps.length === 0 ? '<p class="sub" style="text-align:left;">Заявлений нет</p>' : reps.map(r => `<div class="acct"><div class="name">📨 От ${r.from} на <b>${r.suspect}</b></div><div class="pw">${r.reason} (${r.date})</div></div>`).join('');
+  const q = document.getElementById('police-search').value.toLowerCase().trim();
+  document.getElementById('police-list').innerHTML = loadCards().map((c, idx) => (c.isGov || (q && !c.num.toLowerCase().includes(q) && !(c.ownerNick || '').toLowerCase().includes(q))) ? '' : `<div class="acct">
+    <div class="name">💳 ${c.num} (${c.ownerNick || 'Без владельца'})</div><div class="bal">${parseFloat(c.balance.toFixed(2))} GC</div>
+    <input id="p-rsn-${idx}" placeholder="Причина штрафа"><div class="row"><input type="number" id="p-amt-${idx}" placeholder="Сумма"><button class="btn small red" onclick="issueCardFine(${idx},'p-amt-${idx}','p-rsn-${idx}','police-action-msg','штраф Полиции',renderPolice)">Штраф</button></div></div>`).join('');
+}
+function createCardBank() {
+  const num = document.getElementById('bank-new-card-num').value.trim(), pin = document.getElementById('bank-new-card-pin').value;
+  if (!num || !pin || isGovCard(num)) { showMsg('bank-card-msg', 'Ошибка данных карты!', 'err'); return; }
+  const cards = loadCards(); if (cards.some(c => c.num.toLowerCase() === num.toLowerCase())) { showMsg('bank-card-msg', 'Такая карта уже есть!', 'err'); return; }
+  cards.push({ num, pin, balance: 0, blockedUntil: null, ownerNick: '', transactions: [], isGov: false }); saveCards(cards);
+  document.getElementById('bank-new-card-num').value = ''; document.getElementById('bank-new-card-pin').value = ''; showMsg('bank-card-msg', 'Карта выпущена!', 'ok'); renderBank();
+}
+function renderBank() {
+  renderDirectorPanel('bank', 'bank-director-box', ['bank']);
+  const q = document.getElementById('bank-search').value.toLowerCase().trim();
+  document.getElementById('bank-list').innerHTML = loadCards().map((c, idx) => (q && !c.num.toLowerCase().includes(q) && !(c.ownerNick || '').toLowerCase().includes(q)) ? '' : `<div class="acct">
+    <div class="name">💳 ${c.num} ${c.ownerNick ? `(${c.ownerNick})` : ''} ${isCardBlocked(c) ? `<span class="badge-blocked">БАН</span>` : ''}</div>
+    <div class="bal">${parseFloat(c.balance.toFixed(2))} GC</div>
+    <button class="btn small gray" style="width:100%;" onclick="openBankTransactions('${c.num}')">📜 Транзакции</button>
+    ${c.isGov ? '' : (isCardBlocked(c) ? `<button class="btn small green" style="width:100%; margin-top:4px;" onclick="bankUnblock(${idx})">Разблокировать</button>` : `<div class="row" style="margin-top:4px;"><input type="number" id="b-h-${idx}" placeholder="Часы"><button class="btn small red" onclick="bankBlock(${idx})">Бан</button></div>`)}</div>`).join('');
+}
+function bankBlock(idx) { const h = parseFloat(document.getElementById(`b-h-${idx}`).value); if (h > 0) { const c = loadCards(); const card = c.at(idx); if (card) { card.blockedUntil = Date.now() + h * 3600000; saveCards(c); renderBank(); } } }
+function bankUnblock(idx) { const c = loadCards(); const card = c.at(idx); if (card) { card.blockedUntil = null; saveCards(c); renderBank(); } }
+
+function churchTransfer() { govBoxTransfer('церковь', 'церковь-tr-to', 'церковь-tr-amt', 'церковь-tr-cmt', 'церковь-tr-msg', 'Церковь', renderChurch); }
+function toggleBaptism(idx) { const a = load(); const acc = a.at(idx); if (acc) { acc.baptized = !acc.baptized; save(a); renderChurch(); } }
+function renderChurch() {
+  renderDirectorPanel('church', 'church-director-box', ['church']);
+  renderOrgBox('church-account-box', 'церковь', '⛪ Счёт: церковь', 'church', 'churchTransfer');
+  const q = document.getElementById('church-search').value.toLowerCase().trim();
+  document.getElementById('church-list').innerHTML = load().map((a, idx) => (q && !a.nick.toLowerCase().includes(q)) ? '' : `<div class="acct"><div class="name">${formatNick(a)}</div><button class="btn small church" style="width:100%; margin-top:6px;" onclick="toggleBaptism(${idx})">${a.baptized ? 'Снять крещение' : '☦️ Крестить'}</button></div>`).join('');
+}
+function renderCourt() {
+  renderDirectorPanel('court', 'court-director-box', ['court','court_fed']);
+  const q = document.getElementById('court-search').value.toLowerCase().trim();
+  document.getElementById('court-list').innerHTML = loadCards().map((c, idx) => (c.isGov || (q && !c.num.toLowerCase().includes(q))) ? '' : `<div class="acct"><div class="name">⚖️ ${c.num} (${c.ownerNick || '-'})</div><input id="c-rsn-${idx}" placeholder="Приговор"><div class="row"><input type="number" id="c-amt-${idx}" placeholder="Штраф"><button class="btn small court" onclick="issueCardFine(${idx},'c-amt-${idx}','c-rsn-${idx}','court-action-msg','штраф Суда',renderCourt)">Приговор</button></div></div>`).join('');
+}
+function renderElder() {
+  renderDirectorPanel('elder', 'elder-director-box', ['elder']);
+  const q = document.getElementById('elder-search').value.toLowerCase().trim();
+  document.getElementById('elder-list').innerHTML = loadCards().map((c, idx) => (c.isGov || (q && !c.num.toLowerCase().includes(q))) ? '' : `<div class="acct"><div class="name">🏛 ${c.num} (${c.ownerNick || '-'})</div><input id="e-rsn-${idx}" placeholder="Вердикт"><div class="row"><input type="number" id="e-amt-${idx}" placeholder="Сумма"><button class="btn small elder" onclick="issueCardFine(${idx},'e-amt-${idx}','e-rsn-${idx}','elder-action-msg','взыскание Суда Старейшин',renderElder)">Вердикт</button></div></div>`).join('');
+}
+function hospitalTransfer() { govBoxTransfer('больница', 'больница-tr-to', 'больница-tr-amt', 'больница-tr-cmt', 'больница-tr-msg', 'Больница', renderHospital); }
+function healPatient(idx) { const a = load(); const acc = a.at(idx); if (acc) { acc.hp = 100; save(a); renderHospital(); showMsg('hospital-action-msg', `Пациент ${acc.nick} вылечен (100 HP)!`, 'ok'); } }
+function renderHospital() {
+  renderDirectorPanel('hospital', 'hospital-director-box', ['hospital_ter','hospital_hir','hospital_trav','hospital_kard','hospital_nevr','hospital_ped','hospital_oft','hospital_stom','hospital_psih','hospital_rean']);
+  renderOrgBox('hospital-account-box', 'больница', '🏥 Счёт: больница', 'hospital', 'hospitalTransfer');
+  const q = document.getElementById('hospital-search').value.toLowerCase().trim();
+  document.getElementById('hospital-list').innerHTML = load().map((a, idx) => (q && !a.nick.toLowerCase().includes(q)) ? '' : `<div class="acct"><div class="name">🏥 ${formatNick(a)} (${a.hp ?? 100} HP)</div><button class="btn small hospital" style="width:100%; margin-top:6px;" onclick="healPatient(${idx})">Вылечить до 100 HP</button></div>`).join('');
+}
 Object.assign(window, { applyAppTitle, changeAppTitle, showScreen, adminLogin, mayorLogin, changeMayorPasswordAdmin, resetAllDataAdmin, grantSubWidgetAdmin, removeSubWidgetAdmin, assignGalleryWorkerAdmin, renderAdmin, renderMayor, renderPolice, renderBank, renderChurch, renderCourt, renderElder, renderHospital, renderSchool, renderUniv, renderCollege, renderArmy, renderWar, renderFootball, renderCasino, renderHoliday, renderMint, renderOgurchik, renderGallery, renderGalleryPublic, renderJanitor, renderGavisha, renderGavishaPublic, renderBns, renderBnsStore, renderKiller, renderTck, renderCollector, renderSupport, renderDevitoBuyer, renderDevitoSeller, renderDevitoChat, renderAccount, renderMyBank, renderMessenger, renderCityServices, renderOgurchikViewer, addMoney, takeMoney, adminTransfer, deleteAccount, deleteCard, setBeeWidget, toggleElderCouncil, setAccountAgeAdmin, changeAccPassAdmin, changeCardPinAdmin, sendMsgFromAdmin, blockAccAdmin, unblockAccAdmin, createAccount, createCardAdmin, createCardBank, cityTransfer, buyCityUpgrade, payWeeklyWageMayor, churchTransfer, hospitalTransfer, schoolTransfer, univTransfer, collegeTransfer, armyTransfer, warTransfer, casinoTransfer, holidayTransfer, mintTransfer, ogurchikTransfer, galleryTransfer, janitorTransfer, gavishaTransfer, bnsTransfer, killerTransfer, tckTransfer, collectorTransfer, toggleBaptism, setCitizenJob, fireCitizenJob, setCitizenTax, makeInoagentForever, releaseArmyOrWar, toggleExile, directorHire, directorFire, openJobGate, quickEnterJob, submitJobLogin, jobLogout, ogurchikLogout, setClubSpin, issueCardFine, sendToJail, sendToJailFromCourt, setFootballPrice, healPatient, executeKillerHit, sendTckDraft, catchTckRunner, respondTckNoti, clearAccountNotis, bankBlock, bankUnblock, updateClickerScreen, refreshActiveScreens, approveBonus, rejectBonus, requestBonus, openTransactions, openBankTransactions, closeTransactionsScreen, renderTransactions, showTxComment, closeCommentModal, syncAllSalaries, ensureGovCards, checkClickerAccess, doCoinClick, exitClicker, openDevitoLogin, devitoLogin, devitoLogout, publishDevitoItem, setDevitoDiscount, deleteDevitoItem, withdrawDevitoBalance, buyDevitoItem, confirmDevitoOrder, cancelDevitoOrderBySeller, reportDevitoOrder, resolveSupportTicket, openDevitoChat, closeDevitoChat, sendDevitoChatMsg, accLogin, accLogout, toggleSleep, buyAccountUpgrade, linkCardToAccount, unlinkCard, openMyBank, onSelectActiveCard, doTransfer, createInvoice, payInvoice, declineInvoice, openMessenger, openMessengerPeer, sendMessengerMsg, openGamesMenu, startGame, playTtt, shootBs, pullJenga, playUnoCard, drawUnoCard, playDurakCard, publishGalleryItem, deleteGalleryItem, buyGalleryItem, openCasinoWheel, spinCasinoWheel, openCityServices, startStreetFight, sendPoliceReport, visitEdu, signWarContract, buyHospitalHeal, openOgurchikViewer, publishGavishaPost, deleteGavishaPost, publishBnsItem, buyBnsItem, rebirthAccount });
 
 applyAppTitle(); ensureGovCards(true); startGlobalSalaryTicker();
