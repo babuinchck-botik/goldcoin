@@ -3023,6 +3023,23 @@ function renderHospital() {
   const q = document.getElementById('hospital-search').value.toLowerCase().trim();
   document.getElementById('hospital-list').innerHTML = load().map((a, idx) => (q && !a.nick.toLowerCase().includes(q)) ? '' : `<div class="acct"><div class="name">🏥 ${formatNick(a)} (${a.hp ?? 100} HP)</div><button class="btn small hospital" style="width:100%; margin-top:6px;" onclick="healPatient(${idx})">Вылечить до 100 HP</button></div>`).join('');
 }
+ const _origAccLogin = accLogin;
+accLogin = function() {
+  _origAccLogin();
+  if (currentNick) sessionStorage.setItem('gc_active_nick', currentNick);
+};
+const _origAccLogout = accLogout;
+accLogout = function() {
+  sessionStorage.removeItem('gc_active_nick');
+  _origAccLogout();
+};
+const _origShowScreen = showScreen;
+showScreen = function(name) {
+  if (!currentNick && sessionStorage.getItem('gc_active_nick')) {
+    currentNick = sessionStorage.getItem('gc_active_nick');
+  }
+  _origShowScreen(name);
+};
 Object.assign(window, { applyAppTitle, changeAppTitle, showScreen, adminLogin, mayorLogin, changeMayorPasswordAdmin, resetAllDataAdmin, grantSubWidgetAdmin, removeSubWidgetAdmin, assignGalleryWorkerAdmin, renderAdmin, renderMayor, renderPolice, renderBank, renderChurch, renderCourt, renderElder, renderHospital, renderSchool, renderUniv, renderCollege, renderArmy, renderWar, renderFootball, renderCasino, renderHoliday, renderMint, renderOgurchik, renderGallery, renderGalleryPublic, renderJanitor, renderGavisha, renderGavishaPublic, renderBns, renderBnsStore, renderKiller, renderTck, renderCollector, renderSupport, renderDevitoBuyer, renderDevitoSeller, renderDevitoChat, renderAccount, renderMyBank, renderMessenger, renderCityServices, renderOgurchikViewer, addMoney, takeMoney, adminTransfer, deleteAccount, deleteCard, setBeeWidget, toggleElderCouncil, setAccountAgeAdmin, changeAccPassAdmin, changeCardPinAdmin, sendMsgFromAdmin, blockAccAdmin, unblockAccAdmin, createAccount, createCardAdmin, createCardBank, cityTransfer, buyCityUpgrade, payWeeklyWageMayor, churchTransfer, hospitalTransfer, schoolTransfer, univTransfer, collegeTransfer, armyTransfer, warTransfer, casinoTransfer, holidayTransfer, mintTransfer, ogurchikTransfer, galleryTransfer, janitorTransfer, gavishaTransfer, bnsTransfer, killerTransfer, tckTransfer, collectorTransfer, toggleBaptism, setCitizenJob, fireCitizenJob, setCitizenTax, makeInoagentForever, releaseArmyOrWar, toggleExile, directorHire, directorFire, openJobGate, quickEnterJob, submitJobLogin, jobLogout, ogurchikLogout, setClubSpin, issueCardFine, sendToJail, sendToJailFromCourt, setFootballPrice, healPatient, executeKillerHit, sendTckDraft, catchTckRunner, respondTckNoti, clearAccountNotis, bankBlock, bankUnblock, updateClickerScreen, refreshActiveScreens, approveBonus, rejectBonus, requestBonus, openTransactions, openBankTransactions, closeTransactionsScreen, renderTransactions, showTxComment, closeCommentModal, syncAllSalaries, ensureGovCards, checkClickerAccess, doCoinClick, exitClicker, openDevitoLogin, devitoLogin, devitoLogout, publishDevitoItem, setDevitoDiscount, deleteDevitoItem, withdrawDevitoBalance, buyDevitoItem, confirmDevitoOrder, cancelDevitoOrderBySeller, reportDevitoOrder, resolveSupportTicket, openDevitoChat, closeDevitoChat, sendDevitoChatMsg, accLogin, accLogout, toggleSleep, buyAccountUpgrade, linkCardToAccount, unlinkCard, openMyBank, onSelectActiveCard, doTransfer, createInvoice, payInvoice, declineInvoice, openMessenger, openMessengerPeer, sendMessengerMsg, openGamesMenu, startGame, playTtt, shootBs, pullJenga, playUnoCard, drawUnoCard, playDurakCard, publishGalleryItem, deleteGalleryItem, buyGalleryItem, openCasinoWheel, spinCasinoWheel, openCityServices, startStreetFight, sendPoliceReport, visitEdu, signWarContract, buyHospitalHeal, openOgurchikViewer, publishGavishaPost, deleteGavishaPost, publishBnsItem, buyBnsItem, rebirthAccount });
 
 applyAppTitle(); ensureGovCards(true); startGlobalSalaryTicker();
