@@ -1900,6 +1900,164 @@ function payInvoice(id) {
   saveCards(cards); saveInvoices(invs.filter(x => x.id !== id)); renderMyBank();
 }
 function declineInvoice(id) { if (confirm('Отклонить счёт?')) { saveInvoices(loadInvoices().filter(x => x.id !== id)); renderMyBank(); } }
+ function govBoxTransfer(govNick, toId, amtId, cmtId, msgId, label, renderFn) {
+  const to = document.getElementById(toId).value.trim(), amt = parseFloat(document.getElementById(amtId).value), cmt = document.getElementById(cmtId).value.trim();
+  if (!to || isNaN(amt) || amt <= 0) { showMsg(msgId, 'Укажите карту/счёт и сумму!', 'err'); return; }
+  const cards = loadCards(), gCard = cards.find(c => c.num.toLowerCase() === govNick), tCard = cards.find(c => c.num.toLowerCase() === to.toLowerCase()) || cards.find(c => (c.ownerNick || '').toLowerCase() === to.toLowerCase());
+  if (!tCard || tCard === gCard) { showMsg(msgId, 'Получатель не найден!', 'err'); return; }
+  gCard.balance = parseFloat((gCard.balance - amt).toFixed(2)); tCard.balance = parseFloat((tCard.balance + amt).toFixed(2));
+  addCardTx(gCard, 'minus', amt, `выплата на ${tCard.num} (${label})`, cmt); addCardTx(tCard, 'plus', amt, `от ${label}`, cmt);
+  saveCards(cards); showMsg(msgId, `Выплачено ${amt} GC!`, 'ok'); renderFn();
+}
+function renderOrgBox(boxId, govNick, title, btnCls, fnName) {
+  const box = document.getElementById(boxId); if (!box) return;
+  const gCard = loadCards().find(c => c.num.toLowerCase() === govNick), bal = gCard ? parseFloat(gCard.balance.toFixed(2)) : 0;
+  box.innerHTML = `<div style="display:flex; justify-content:space-between;"><span class="name">${title}</span><span class="badge-gov">СЧЁТ ОРГ.</span></div>
+    <div class="bal" style="font-size:20px; font-weight:800; margin:6px 0;">${bal} GC</div>
+    <input id="${govNick}-tr-to" placeholder="Карта или ник получателя"><input id="${govNick}-tr-amt" type="number" step="0.01" placeholder="Сумма в GC"><input id="${govNick}-tr-cmt" placeholder="Назначение">
+    <button class="btn small ${btnCls}" style="width:100%; margin-top:6px;" onclick="${fnName}()">Выплатить со счёта</button><div class="msg" id="${govNick}-tr-msg" style="margin-bottom:0;"></div>`;
+}
+function openCasinoWheel() {
+  if (!currentNick) { alert('Сначала войдите в «👤 Мой аккаунт»!'); showScreen('acc-login'); return; }
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (acc && (acc.age ?? 18) < 18) { alert('🎰 Вход в Казино разрешён только с 18 лет!'); return; }
+  showScreen('casino-wheel');
+  const card = loadCards().find(c => c.num === activeCardNum);
+  document.getElementById('casino-wheel-bal').textContent = card ? `Активная карта: ${card.num} (${parseFloat(card.balance.toFixed(2))} GC)` : 'Привяжите карту в аккаунте!';
+}
+function spinCasinoWheel() {
+  if (wheelSpinning || !currentNick) return;
+  const bet = parseFloat(document.getElementById('casino-bet-amount').value);
+  if (isNaN(bet) || bet <= 0) { showMsg('casino-wheel-msg', 'Введите корректную ставку!', 'err'); return; }
+  const cards = loadCards(), playerCard = cards.find(c => c.num === activeCardNum), casinoCard = cards.find(c => c.num.toLowerCase() === 'казино');
+  if (!playerCard || isCardBlocked(playerCard)) { showMsg('casino-wheel-msg', 'Нет активной рабочей карты!', 'err'); return; }
+  if (playerCard.balance < bet) { showMsg('casino-wheel-msg', 'Недостаточно GC на карте!', 'err'); return; }
+  playerCard.balance = parseFloat((playerCard.balance - bet).toFixed(2)); casinoCard.balance = parseFloat((casinoCard.balance + bet).toFixed(2));
+  addCardTx(playerCard, 'minus', bet, 'ставка в Казино'); addCardTx(casinoCard, 'plus', bet, `ставка от ${currentNick}`);
+  saveCards(cards); wheelSpinning = true;
+  const sector = Math.floor(Math.random() * 10);
+  const targetDeg = sector === 0 ? 342 : (360 - (sector * 36 + 18));
+  wheelAngle += 1800 + targetDeg - (wheelAngle % 360);
+  document.getElementById('casino-wheel-disc').style.transform = `rotate(${wheelAngle}deg)`;
+  setTimeout(() => {
+    wheelSpinning = false;
+    const freshCards = loadCards(), pCard = freshCards.find(c => c.num === activeCardNum), cCard = freshCards.find(c => c.num.toLowerCase() === 'казино');
+    if (sector === 0) {
+      const win = parseFloat((bet * 2).toFixed(2));
+      cCard.balance = parseFloat((cCard.balance - win).toFixed(2)); pCard.balance = parseFloat((pCard.balance + win).toFixed(2));
+      addCardTx(cCard, 'minus', win, `выигрыш x2 (${currentNick})`); addCardTx(pCard, 'plus', win, 'выигрыш x2 в Казино!');
+      saveCards(freshCards); showMsg('casino-wheel-msg', `🎉 ВЫПАЛО x2! Вы выиграли ${win} GC!`, 'ok');
+    } else { showMsg('casino-wheel-msg', `😢 Выпал сектор 0. Вы проиграли ${bet} GC.`, 'err'); }
+    document.getElementById('casino-wheel-bal').textContent = `Активная карта: ${pCard.num} (${parseFloat(pCard.balance.toFixed(2))} GC)`;
+  }, 3300);
+}
+function openCityServices() {
+  if (!currentNick) { alert('Сначала войдите в «👤 Мой аккаунт»!'); showScreen('acc-login'); return; }
+  showScreen('city-services');
+}
+function renderCityServices() {
+  if (!currentNick) return;
+  const acc = load().find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (!acc) return;
+  const age = acc.age ?? 18;
+  document.getElementById('services-age-info').innerHTML = `Ваш возраст: <b>${age} лет</b> • Здоровье: <b>${acc.hp ?? 100} HP</b>`;
+  let html = '';
+  if (age < 18) html += `<div class="acct"><div class="name">🏫 Школа (до 18 лет)</div><div class="pw">Вам доступно школьное обучение</div><button class="btn small edu" style="width:100%; margin-top:6px;" onclick="visitEdu('Школе')">Посетить урок в Школе</button></div>`;
+  if (age >= 15) html += `<div class="acct"><div class="name">📚 Колледж (с 15 лет)</div><button class="btn small edu" style="width:100%; margin-top:6px;" onclick="visitEdu('Колледже')">Посетить пару в Колледже</button></div>`;
+  if (age >= 17) html += `<div class="acct"><div class="name">🎓 Университет (с 17 лет)</div><button class="btn small edu" style="width:100%; margin-top:6px;" onclick="visitEdu('Университете')">Посетить лекцию в Универе</button></div>`;
+  if (age >= 18) {
+    html += `<div class="acct"><div class="name">⚔️ Контракт на Войну (18+)</div><div class="pw">После подписания освободить может только Мэр!</div>
+      ${acc.warContract ? '<div class="msg err">Вы уже служите по контракту!</div>' : '<button class="btn small war" style="width:100%; margin-top:6px;" onclick="signWarContract()">Подписать контракт на Войну</button>'}</div>`;
+  }
+  html += `<div class="acct"><div class="name">🏥 Лечение в Больнице (50 GC → 100 HP)</div><button class="btn small hospital" style="width:100%; margin-top:6px;" onclick="buyHospitalHeal()">Вылечиться в Больнице</button></div>`;
+  document.getElementById('services-adaptive-list').innerHTML = html;
+}
+function startStreetFight() {
+  if (!currentNick) return;
+  const targetNick = document.getElementById('fight-target-nick').value.trim();
+  if (!targetNick) { showMsg('services-msg', 'Введите ник соперника!', 'err'); return; }
+  const accs = load(), me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase()), opp = accs.find(a => a.nick.toLowerCase() === targetNick.toLowerCase());
+  if (!opp || opp === me) { showMsg('services-msg', 'Соперник не найден!', 'err'); return; }
+  me.hp = Math.max(0, (me.hp ?? 100) - 25); opp.hp = Math.max(0, (opp.hp ?? 100) - 25); save(accs);
+  pushAccNoti(opp.nick, `🥊 Гражданин ${me.nick} подрался с вами! Вы потеряли -25 HP (осталось ${opp.hp} HP).`);
+  document.getElementById('fight-target-nick').value = '';
+  showMsg('services-msg', `🥊 Драка с ${opp.nick}! Обоим снято -25 HP.`, 'ok'); refreshActiveScreens();
+}
+function sendPoliceReport() {
+  if (!currentNick) return;
+  const suspect = document.getElementById('rep-suspect-nick').value.trim(), reason = document.getElementById('rep-reason').value.trim();
+  if (!suspect || !reason) { showMsg('services-msg', 'Укажите нарушителя и суть заявления!', 'err'); return; }
+  const reps = loadPoliceReports();
+  reps.unshift({ id: Date.now(), from: currentNick, suspect, reason, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  savePoliceReports(reps); document.getElementById('rep-suspect-nick').value = ''; document.getElementById('rep-reason').value = '';
+  showMsg('services-msg', '🚓 Заявление передано в Полицию!', 'ok');
+}
+function visitEdu(place) { showMsg('services-msg', `📖 Вы успешно прошли занятие в ${place}!`, 'ok'); }
+function signWarContract() {
+  if (!currentNick || !confirm('Подписать контракт на Войну? Освободить вас сможет только Мэр!')) return;
+  const accs = load(), me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  if (me) { me.warContract = true; me.job = 'war'; save(accs); renderCityServices(); showMsg('services-msg', '⚔️ Контракт подписан! Вы зачислены на Войну.', 'ok'); }
+}
+function buyHospitalHeal() {
+  if (!currentNick) return;
+  const accs = load(), cards = loadCards(), me = accs.find(a => a.nick.toLowerCase() === currentNick.toLowerCase());
+  const myCard = cards.find(c => c.num === activeCardNum), hospCard = cards.find(c => c.num.toLowerCase() === 'больница');
+  if (!myCard || myCard.balance < 50) { showMsg('services-msg', 'Нужна карта с балансом от 50 GC!', 'err'); return; }
+  myCard.balance = parseFloat((myCard.balance - 50).toFixed(2)); hospCard.balance = parseFloat((hospCard.balance + 50).toFixed(2));
+  addCardTx(myCard, 'minus', 50, 'лечение в Больнице'); addCardTx(hospCard, 'plus', 50, `лечение (${me.nick})`);
+  me.hp = 100; save(accs); saveCards(cards); renderCityServices(); showMsg('services-msg', '🏥 Вы полностью вылечены (100 HP)!', 'ok');
+}
+function openOgurchikViewer() { showScreen('ogurchik-viewer'); }
+function renderOgurchikViewer() {
+  const stage = document.getElementById('ogurchik-viewer-stage'); if (!stage) return;
+  const st = loadClubState();
+  if (!st.activeDancer) stage.innerHTML = `<div class="pole-stage"><div class="pole-rod"></div></div><p class="sub">Сейчас на сцене пустой шест — танцовщица ещё не вышла на смену.</p>`;
+  else {
+    const cls = st.spinDir === 'left' ? 'dancer-left' : (st.spinDir === 'right' ? 'dancer-right' : '');
+    const dirText = st.spinDir === 'left' ? 'крутится влево' : (st.spinDir === 'right' ? 'крутится вправо' : 'стоит у шеста');
+    stage.innerHTML = `<div class="pole-stage"><div class="pole-rod"></div><div class="dancer-avatar ${cls}">💃</div></div><p class="sub" style="color:#f0abfc;">На сцене: <b>${st.activeDancer}</b> (${dirText})</p>`;
+  }
+}
+function setClubSpin(dir) {
+  if (!activeJobNick) return;
+  saveClubState({ activeDancer: activeJobNick, spinDir: dir });
+  const el = document.getElementById('ogurchik-work-dancer');
+  if (el) el.className = 'dancer-avatar ' + (dir === 'left' ? 'dancer-left' : (dir === 'right' ? 'dancer-right' : ''));
+}
+function ogurchikLogout() {
+  const st = loadClubState();
+  if (st.activeDancer && activeJobNick && st.activeDancer.toLowerCase() === activeJobNick.toLowerCase()) saveClubState({ activeDancer: null, spinDir: 'idle' });
+  jobLogout();
+}
+function openJobGate(dept) {
+  pendingJobDept = dept;
+  document.getElementById('job-login-title').textContent = 'Вход: ' + getJobLabel(dept);
+  if (currentNick) { quickEnterJob(dept); return; }
+  showScreen('job-login');
+}
+function enterWorkSuccess(acc, dept) {
+  const accs = load(), target = accs.find(a => a.nick.toLowerCase() === acc.nick.toLowerCase());
+  target.hp = Math.max(0, (target.hp ?? 100) - 5); target.workWidget = getJobLabel(target.job); target.weeklyShifts = (target.weeklyShifts || 0) + 1;
+  save(accs); activeJobNick = target.nick;
+  if (dept === 'ogurchik') saveClubState({ activeDancer: target.nick, spinDir: 'idle' });
+  showScreen(dept);
+}
+function quickEnterJob(dept) {
+  const acc = load().find(a => a.nick.toLowerCase() === (currentNick || '').toLowerCase());
+  if (!acc || !acc.job || !acc.job.startsWith(dept)) { alert('Вы не устроены на эту работу!'); return; }
+  if (acc.exiled || acc.isInoagent || isAccBlocked(acc) || isInJail(acc) || (acc.hp ?? 100) <= 0) { alert('Вход недоступен!'); return; }
+  enterWorkSuccess(acc, dept);
+}
+function submitJobLogin() {
+  const nick = document.getElementById('job-login-nick').value.trim(), pass = document.getElementById('job-login-pass').value;
+  const acc = load().find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (!acc) { showMsg('job-login-msg', 'Неверный ник или пароль!', 'err'); return; }
+  if (acc.exiled || acc.isInoagent || isAccBlocked(acc) || isInJail(acc) || (acc.hp ?? 100) <= 0) { showMsg('job-login-msg', 'Доступ запрещён!', 'err'); return; }
+  if (!acc.job || !acc.job.startsWith(pendingJobDept)) { showMsg('job-login-msg', 'Вы не назначены на эту работу!', 'err'); return; }
+  document.getElementById('job-login-nick').value = ''; document.getElementById('job-login-pass').value = '';
+  enterWorkSuccess(acc, pendingJobDept);
+}
+function jobLogout() { activeJobNick = null; showScreen('home'); }
 function publishGavishaPost() {
   const title = document.getElementById('gav-post-title').value.trim(), text = document.getElementById('gav-post-text').value.trim();
   if (!title || !text) { showMsg('gav-post-msg', 'Заполните заголовок и текст!', 'err'); return; }
