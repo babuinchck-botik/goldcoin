@@ -471,7 +471,10 @@
 
   <!-- МОЙ АККАУНТ -->
   <div id="screen-account" class="hidden">
-    <button class="back" onclick="accLogout()">← Выйти из аккаунта</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <button class="back" style="margin:0;" onclick="showScreen('home')">🏠 В главное меню</button>
+  <button class="back" style="margin:0; color:#ff7b7b;" onclick="accLogout()">🚪 Выйти</button>
+</div>
     <h2 id="acc-title">👤 Аккаунт</h2>
     <div id="acc-age-hp" class="pw" style="margin-bottom:4px;"></div>
     <div class="hp-bar-wrap"><div id="acc-hp-bar" class="hp-bar-fill"></div></div>
@@ -3043,6 +3046,34 @@ showScreen = function(name) {
 Object.assign(window, { applyAppTitle, changeAppTitle, showScreen, adminLogin, mayorLogin, changeMayorPasswordAdmin, resetAllDataAdmin, grantSubWidgetAdmin, removeSubWidgetAdmin, assignGalleryWorkerAdmin, renderAdmin, renderMayor, renderPolice, renderBank, renderChurch, renderCourt, renderElder, renderHospital, renderSchool, renderUniv, renderCollege, renderArmy, renderWar, renderFootball, renderCasino, renderHoliday, renderMint, renderOgurchik, renderGallery, renderGalleryPublic, renderJanitor, renderGavisha, renderGavishaPublic, renderBns, renderBnsStore, renderKiller, renderTck, renderCollector, renderSupport, renderDevitoBuyer, renderDevitoSeller, renderDevitoChat, renderAccount, renderMyBank, renderMessenger, renderCityServices, renderOgurchikViewer, addMoney, takeMoney, adminTransfer, deleteAccount, deleteCard, setBeeWidget, toggleElderCouncil, setAccountAgeAdmin, changeAccPassAdmin, changeCardPinAdmin, sendMsgFromAdmin, blockAccAdmin, unblockAccAdmin, createAccount, createCardAdmin, createCardBank, cityTransfer, buyCityUpgrade, payWeeklyWageMayor, churchTransfer, hospitalTransfer, schoolTransfer, univTransfer, collegeTransfer, armyTransfer, warTransfer, casinoTransfer, holidayTransfer, mintTransfer, ogurchikTransfer, galleryTransfer, janitorTransfer, gavishaTransfer, bnsTransfer, killerTransfer, tckTransfer, collectorTransfer, toggleBaptism, setCitizenJob, fireCitizenJob, setCitizenTax, makeInoagentForever, releaseArmyOrWar, toggleExile, directorHire, directorFire, openJobGate, quickEnterJob, submitJobLogin, jobLogout, ogurchikLogout, setClubSpin, issueCardFine, sendToJail, sendToJailFromCourt, setFootballPrice, healPatient, executeKillerHit, sendTckDraft, catchTckRunner, respondTckNoti, clearAccountNotis, bankBlock, bankUnblock, updateClickerScreen, refreshActiveScreens, approveBonus, rejectBonus, requestBonus, openTransactions, openBankTransactions, closeTransactionsScreen, renderTransactions, showTxComment, closeCommentModal, syncAllSalaries, ensureGovCards, checkClickerAccess, doCoinClick, exitClicker, openDevitoLogin, devitoLogin, devitoLogout, publishDevitoItem, setDevitoDiscount, deleteDevitoItem, withdrawDevitoBalance, buyDevitoItem, confirmDevitoOrder, cancelDevitoOrderBySeller, reportDevitoOrder, resolveSupportTicket, openDevitoChat, closeDevitoChat, sendDevitoChatMsg, accLogin, accLogout, toggleSleep, buyAccountUpgrade, linkCardToAccount, unlinkCard, openMyBank, onSelectActiveCard, doTransfer, createInvoice, payInvoice, declineInvoice, openMessenger, openMessengerPeer, sendMessengerMsg, openGamesMenu, startGame, playTtt, shootBs, pullJenga, playUnoCard, drawUnoCard, playDurakCard, publishGalleryItem, deleteGalleryItem, buyGalleryItem, openCasinoWheel, spinCasinoWheel, openCityServices, startStreetFight, sendPoliceReport, visitEdu, signWarContract, buyHospitalHeal, openOgurchikViewer, publishGavishaPost, deleteGavishaPost, publishBnsItem, buyBnsItem, rebirthAccount });
 
 applyAppTitle(); ensureGovCards(true); startGlobalSalaryTicker();
+ window.accLogin = function() {
+  syncAllSalaries(false);
+  const nick = document.getElementById('acc-nick').value.trim();
+  const pass = document.getElementById('acc-pass').value;
+  const acc = load().find(a => a.nick.toLowerCase() === nick.toLowerCase() && a.pass === pass);
+  if (!acc) { showMsg('acc-msg', 'Неверный ник или пароль', 'err'); return; }
+  if (acc.isInoagent || acc.exiled) { showMsg('acc-msg', 'Вы изгнаны из города!', 'err'); return; }
+  if (isAccBlocked(acc)) { showMsg('acc-msg', 'Аккаунт заблокирован!', 'err'); return; }
+  document.getElementById('acc-nick').value = '';
+  document.getElementById('acc-pass').value = '';
+  currentNick = acc.nick;
+  localStorage.setItem('gc_saved_nick', acc.nick);
+  const myCards = loadCards().filter(c => (c.ownerNick || '').toLowerCase() === acc.nick.toLowerCase());
+  activeCardNum = myCards.length > 0 ? myCards.at(0).num : null;
+  showScreen('account');
+};
+
+window.accLogout = function() {
+  syncAllSalaries(true);
+  currentNick = null;
+  activeCardNum = null;
+  localStorage.removeItem('gc_saved_nick');
+  showScreen('home');
+};
+
+if (localStorage.getItem('gc_saved_nick')) {
+  currentNick = localStorage.getItem('gc_saved_nick');
+}
 </script>
 </body>
 </html>
